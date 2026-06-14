@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_pixelbooth_docs=self.webpackChunk_pixelbooth_docs||[]).push([[7313],{7313(e,c,s){s.d(c,{createArchitectureServices:()=>t.S});var t=s(3121);s(3435)}}]);
