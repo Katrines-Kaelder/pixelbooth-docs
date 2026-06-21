@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-operator/qr-sharing-setup" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">QR Sharing Setup (share remote + sharepage) | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/operator/qr-sharing-setup"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="QR Sharing Setup (share remote + sharepage) | Pixelbooth Docs"><meta data-rh="true" name="description" content="This guide sets up guest QR sharing: a guest scans the booth&#x27;s QR and opens their photo"><meta data-rh="true" property="og:description" content="This guide sets up guest QR sharing: a guest scans the booth&#x27;s QR and opens their photo"><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/operator/qr-sharing-setup"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/operator/qr-sharing-setup" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/operator/qr-sharing-setup" hreflang="x-default"><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_SfMd" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/pixelbooth-docs/"><div class="navbar__logo"><img src="/pixelbooth-docs/img/logo.svg" alt="Pixelbooth" class="themedComponent_APyr themedComponent--light_EO7i"><img src="/pixelbooth-docs/img/logo.svg" alt="Pixelbooth" class="themedComponent_APyr themedComponent--dark_pCh9"></div><b class="navbar__title text--truncate">Pixelbooth</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/pixelbooth-docs/">Start</a><a class="navbar__item navbar__link" href="/pixelbooth-docs/roadmap">Roadmap</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/pixelbooth-docs/reference">Reference</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/Katrines-Kaelder/pixelbooth" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_zVqi"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_d0wt colorModeToggle_UA7r"><button class="clean-btn toggleButton_QTuX toggleButtonDisabled_VJ6V" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd lightToggleIcon_qTfc"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd darkToggleIcon_chyJ"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd systemToggleIcon_zMbt"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_mV6h"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_VHsW"><div class="docsWrapper_RrKg"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_yQBR" type="button"></button><div class="docRoot_hbZ6"><main class="docMainContainer_qe5w docMainContainerEnhanced_T44m"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_xk77"><div class="docItemContainer_l7WK"><article><div class="tocCollapsible_YFIb theme-doc-toc-mobile tocMobile_RDqH"><button type="button" class="clean-btn tocCollapsibleButton_yU99">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>QR Sharing Setup (share remote + sharepage)</h1></header>
+<p>This guide sets up guest <strong>QR sharing</strong>: a guest scans the booth&#x27;s QR and opens their photo
+on their own phone over mobile data. It ties together the three pieces — a <strong>share remote</strong>,
+the <strong>sharepage</strong>, and the <strong>Sharing settings</strong> — into one copy-paste setup.</p>
+<p>See <a class="" href="/pixelbooth-docs/reference/architecture/decisions/cloud-share-services-and-qr">ADR-0018</a> for the design
+and <a class="" href="/pixelbooth-docs/reference/architecture/admin-control-plane">admin-control-plane.md</a> §Remotes for the field
+reference. Per-remote credential handling (write-only secrets) is
+<a class="" href="/pixelbooth-docs/reference/architecture/decisions/write-only-remote-secrets">ADR-0020</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="why-it-needs-a-share-host">Why it needs a share host<a href="#why-it-needs-a-share-host" class="hash-link" aria-label="Direct link to Why it needs a share host" title="Direct link to Why it needs a share host" translate="no">​</a></h2>
+<p>Guest phones can&#x27;t reach the Pi at the venue. So the booth <strong>uploads each finished photo to
+a public host</strong> (the <em>share remote</em>) and the QR encodes a public URL on that host. The host
+is a <strong>dumb static/file server</strong> — no PHP, no server-side script. It serves two things:</p>
+<ol>
+<li class="">the static <strong>sharepage</strong> (<code>apps/sharepage/index.html</code>), and</li>
+<li class="">the uploaded photos, under per-event folders.</li>
+</ol>
+<div class="language-text codeBlockContainer_TPi_ theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_hDBg"><pre tabindex="0" class="prism-code language-text codeBlock_Pnsf thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_NMcC"><div class="token-line" style="color:#393A34"><span class="token plain">host-root/</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">├── index.html                                   ← the sharepage (sharepage_url points here)</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">└── friday-bar/                                  ← {event slug}</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">    └── 2026-06-19-21.04.11-Xa9f2Qe.jpg          ← uploaded photo (the QR&#x27;s ?id=)</span><br></div></code></pre></div></div>
+<p>Any S3/MinIO, WebDAV/Nextcloud, FTP, or SFTP host with a public base URL works. (Google
+Drive and Immich are backup/sync remotes, <strong>not</strong> QR backends — they have no plain public
+URL surface.)</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="prerequisites">Prerequisites<a href="#prerequisites" class="hash-link" aria-label="Direct link to Prerequisites" title="Direct link to Prerequisites" translate="no">​</a></h2>
+<ul>
+<li class="">A host you control with a <strong>public base URL</strong> guests can open (e.g.
+<code>https://share.your-host.example</code>). For MinIO this is typically a bucket exposed over
+HTTPS with public read on the object keys.</li>
+<li class=""><code>rclone</code> on the machine you run the helper from (<code>brew install rclone</code> /
+<a href="https://rclone.org/downloads/" target="_blank" rel="noopener noreferrer" class="">rclone downloads</a>). The booth&#x27;s API image
+already includes it.</li>
+<li class="">The host credentials (for MinIO: endpoint, access key, secret key, bucket).</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="step-1--add-the-share-remote-in-admin">Step 1 — Add the share remote in admin<a href="#step-1--add-the-share-remote-in-admin" class="hash-link" aria-label="Direct link to Step 1 — Add the share remote in admin" title="Direct link to Step 1 — Add the share remote in admin" translate="no">​</a></h2>
+<p>In <strong>Admin → Sharing → Remotes → New remote</strong>:</p>
+<ol>
+<li class=""><strong>Name</strong> it (e.g. &quot;Share host&quot;).</li>
+<li class=""><strong>Destination</strong> → <code>S3 / MinIO</code> (or your host type). The form shows exactly that backend&#x27;s
+fields.</li>
+<li class="">Fill the connection fields (for MinIO: endpoint, access key ID, secret access key,
+bucket; <code>provider</code> defaults to <code>Minio</code>). Use the eye toggle to verify the secret key,
+then add the remote.</li>
+<li class="">Click <strong>Test</strong> — you should see <code>Connected to &#x27;&lt;remote name&gt;&#x27;.</code> within a few seconds.
+(A wrong endpoint fails fast instead of hanging.)</li>
+</ol>
+<p>Secrets are write-only: once saved they&#x27;re never shown back, and on <strong>Edit</strong> a blank secret
+keeps the stored one (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/write-only-remote-secrets">ADR-0020</a>).</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="step-2--turn-on-qr-sharing">Step 2 — Turn on QR sharing<a href="#step-2--turn-on-qr-sharing" class="hash-link" aria-label="Direct link to Step 2 — Turn on QR sharing" title="Direct link to Step 2 — Turn on QR sharing" translate="no">​</a></h2>
+<p>In <strong>Admin → Sharing</strong> (the settings form):</p>
+<ul>
+<li class=""><strong>Share remote</strong> → the remote you just added.</li>
+<li class=""><strong>Link mode</strong> → <code>sharepage</code> (default).</li>
+<li class=""><strong>Sharepage URL</strong> → the public base URL where <code>index.html</code> and the photos live. On
+<strong>S3/MinIO this must include the bucket</strong>, e.g. <code>https://s3.your-host.example/your-bucket</code>
+(not the bare host — the bare host resolves to the MinIO API/console). The QR targets
+<code>{sharepage_url}/index.html?id=…</code> so it works on object stores, which don&#x27;t serve a
+directory index.</li>
+<li class=""><strong>Share variant</strong> → <code>final</code> (default) or <code>original</code>.</li>
+<li class="">Enable QR sharing.</li>
+</ul>
+<p>Use the <strong>live share-link preview</strong> on the page to confirm the example URL looks right for
+the active event.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="step-3--deploy-the-sharepage">Step 3 — Deploy the sharepage<a href="#step-3--deploy-the-sharepage" class="hash-link" aria-label="Direct link to Step 3 — Deploy the sharepage" title="Direct link to Step 3 — Deploy the sharepage" translate="no">​</a></h2>
+<p>On the <strong>share remote&#x27;s row</strong> in Admin → Sharing → Remotes, click <strong>Deploy sharepage</strong>. The
+API uploads <code>apps/sharepage/index.html</code> to the remote&#x27;s root using the credentials it
+already stores — no second tool and no re-typed secret
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/in-app-sharepage-deploy">ADR-0021</a>). On success it shows
+an <strong>Open sharepage</strong> link so you can eyeball it.</p>
+<blockquote>
+<p>For S3/MinIO, make sure the uploaded objects (the page <strong>and</strong> the photos) are publicly
+readable, or the QR opens a broken page.</p>
+</blockquote>
+<details class="details_Uywt alert alert--info details_HAy5" data-collapsed="true"><summary>Alternative: the CLI helper (bootstrap / CI)</summary><div><div class="collapsibleContent_bTqk"><p><code>scripts/share-host-setup</code> deploys the page and prints the admin values from your machine —
+useful to stand up a host <strong>before</strong> a remote exists in admin, or in CI. Pass secrets via
+env vars so they never land in shell history or <code>ps</code>:</p><div class="language-bash codeBlockContainer_TPi_ theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_hDBg"><pre tabindex="0" class="prism-code language-bash codeBlock_Pnsf thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_NMcC"><div class="token-line" style="color:#393A34"><span class="token plain">cd scripts/share-host-setup</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">PB_SECRET_ACCESS_KEY=… python sharehost.py --backend s3 \</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">    --endpoint https://minio.your-host.example --bucket pixelbooth --prefix friday-bar \</span><br></div><div class="token-line" style="color:#393A34"><span class="token plain">    --access-key-id AKIA… --public-base-url https://share.your-host.example</span><br></div></code></pre></div></div><p>Other backends (WebDAV/Nextcloud, FTP/SFTP) are in
+<a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/scripts/share-host-setup/README.md" target="_blank" rel="noopener noreferrer" class="">scripts/share-host-setup/README.md</a>. You can also
+copy <code>apps/sharepage/index.html</code> to the host root by any other means.</p></div></div></details>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="step-4--verify-end-to-end">Step 4 — Verify end to end<a href="#step-4--verify-end-to-end" class="hash-link" aria-label="Direct link to Step 4 — Verify end to end" title="Direct link to Step 4 — Verify end to end" translate="no">​</a></h2>
+<ol>
+<li class="">Take a photo at the booth.</li>
+<li class="">When the render finishes, the booth uploads it to the share remote (auto, off the capture
+path) and the QR becomes scannable.</li>
+<li class="">Scan it on a phone on mobile data → the sharepage loads the photo with a <strong>SAVE</strong> button.</li>
+</ol>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="troubleshooting">Troubleshooting<a href="#troubleshooting" class="hash-link" aria-label="Direct link to Troubleshooting" title="Direct link to Troubleshooting" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Test hangs / fails:</strong> check the endpoint URL (scheme + host, reachable from the booth)
+and that the bucket exists. The test bounds connect/IO time and disables retries, so a bad
+endpoint reports an error in ~10s rather than spinning.</li>
+<li class=""><strong>QR opens a broken page:</strong> confirm <code>index.html</code> is at the host <strong>root</strong> (the
+<code>sharepage_url</code>), and that uploaded objects are <strong>publicly readable</strong> at
+<code>{sharepage_url}/{event}/{file}</code>.</li>
+<li class=""><strong>QR opens the MinIO console / a login or bucket listing:</strong> <code>sharepage_url</code> is pointing
+at the bare host or a directory. On S3/MinIO it must include the <strong>bucket</strong>
+(<code>https://host/bucket</code>); the link targets <code>…/index.html?id=…</code>, which object stores serve
+(they don&#x27;t serve a directory index for <code>…/</code>).</li>
+<li class=""><strong>QR never appears for a photo:</strong> check the remote is <strong>enabled</strong> and designated as the
+share remote, and watch the sync job/queue in admin; the durable outbox retries failed
+uploads.</li>
+<li class=""><strong>Per-event folders:</strong> the object key is <code>{event-slug}/{file}</code>, so set the event slug in
+the Event settings before the night.</li>
+<li class=""><strong>Deploy/upload fails with a 502 (Test passes):</strong> the host accepts listing but not the
+upload. Two known causes behind a reverse proxy: a stale <code>rclone</code> (the Debian <code>apt</code>
+package is years old and breaks uploads — install the current official binary,
+<code>curl https://rclone.org/install.sh | sudo bash</code>), and HTTP/2 — the booth forces rclone
+to HTTP/1.1, but if you proxy S3 yourself, allow upload bodies (e.g. Caddy
+<code>protocols h1</code>). The booth surfaces only the proxy&#x27;s truncated tail; check the host&#x27;s
+proxy log for the real reason.</li>
+<li class=""><strong>Deploy fails with <code>PermanentRedirect</code> (HTTP 308):</strong> the remote&#x27;s <strong>Region</strong> doesn&#x27;t
+match the server, so the signed request is rejected. Set <strong>Region</strong> on the remote
+(Admin → Remotes → edit) to the server&#x27;s region — MinIO defaults to <code>us-east-1</code>; find a
+bucket&#x27;s region with <code>curl -s &quot;{endpoint}/{bucket}/?location&quot;</code>. Keep <strong>Path-style
+addressing</strong> = true for MinIO/self-hosted S3.</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/operator/qr-sharing-setup.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#why-it-needs-a-share-host" class="table-of-contents__link toc-highlight">Why it needs a share host</a></li><li><a href="#prerequisites" class="table-of-contents__link toc-highlight">Prerequisites</a></li><li><a href="#step-1--add-the-share-remote-in-admin" class="table-of-contents__link toc-highlight">Step 1 — Add the share remote in admin</a></li><li><a href="#step-2--turn-on-qr-sharing" class="table-of-contents__link toc-highlight">Step 2 — Turn on QR sharing</a></li><li><a href="#step-3--deploy-the-sharepage" class="table-of-contents__link toc-highlight">Step 3 — Deploy the sharepage</a></li><li><a href="#step-4--verify-end-to-end" class="table-of-contents__link toc-highlight">Step 4 — Verify end to end</a></li><li><a href="#troubleshooting" class="table-of-contents__link toc-highlight">Troubleshooting</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+</body>
+</html>

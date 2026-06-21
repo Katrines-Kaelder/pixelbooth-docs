@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-roadmap/test-plan" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">Validation Test Plan | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/roadmap/test-plan"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Validation Test Plan | Pixelbooth Docs"><meta data-rh="true" name="description" content="Pixelbooth is built mostly away from the physical booth and away from real share"><meta data-rh="true" property="og:description" content="Pixelbooth is built mostly away from the physical booth and away from real share"><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/roadmap/test-plan"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/roadmap/test-plan" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/roadmap/test-plan" hreflang="x-default"><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_SfMd" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/pixelbooth-docs/"><div class="navbar__logo"><img src="/pixelbooth-docs/img/logo.svg" alt="Pixelbooth" class="themedComponent_APyr themedComponent--light_EO7i"><img src="/pixelbooth-docs/img/logo.svg" alt="Pixelbooth" class="themedComponent_APyr themedComponent--dark_pCh9"></div><b class="navbar__title text--truncate">Pixelbooth</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/pixelbooth-docs/">Start</a><a class="navbar__item navbar__link" href="/pixelbooth-docs/roadmap">Roadmap</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/pixelbooth-docs/reference">Reference</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/Katrines-Kaelder/pixelbooth" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_zVqi"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_d0wt colorModeToggle_UA7r"><button class="clean-btn toggleButton_QTuX toggleButtonDisabled_VJ6V" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd lightToggleIcon_qTfc"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd darkToggleIcon_chyJ"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd systemToggleIcon_zMbt"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_mV6h"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_VHsW"><div class="docsWrapper_RrKg"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_yQBR" type="button"></button><div class="docRoot_hbZ6"><main class="docMainContainer_qe5w docMainContainerEnhanced_T44m"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_xk77"><div class="docItemContainer_l7WK"><article><div class="tocCollapsible_YFIb theme-doc-toc-mobile tocMobile_RDqH"><button type="button" class="clean-btn tocCollapsibleButton_yU99">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>Validation Test Plan</h1></header>
+<p>Pixelbooth is built mostly away from the physical booth and away from real share
+infrastructure. A large body of work is &quot;done&quot; against fake adapters, unit
+tests, and local development, but has never been exercised on the target
+Raspberry Pi, a real camera, a real share remote, or a phone on mobile data.</p>
+<p>This plan turns that backlog into <strong>ordered test sessions</strong> grouped by the setup
+each one needs, so they can be run in efficient batches. It is the execution
+companion to <a class="" href="/pixelbooth-docs/reference/roadmap/known-issues"><code>known-issues.md</code></a>: every session names the
+known-issue (<code>KI-###</code>) rows it validates, and every result should flow back into
+that register.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="how-to-use-this-plan">How To Use This Plan<a href="#how-to-use-this-plan" class="hash-link" aria-label="Direct link to How To Use This Plan" title="Direct link to How To Use This Plan" translate="no">​</a></h2>
+<ol>
+<li class="">Pick the lowest-numbered session whose prerequisites you can satisfy.</li>
+<li class="">Record the environment baseline (Session 0) once per test day.</li>
+<li class="">Work the session steps top to bottom: happy path first, then degraded and
+failure states.</li>
+<li class="">Capture the listed measurements and at least one concrete artifact per
+finding (log line, screenshot, photo, media id, diagnostic id, command
+output).</li>
+<li class="">Type findings into <a class="" href="/pixelbooth-docs/reference/roadmap/test-notes.inbox"><code>test-notes.inbox.md</code></a> as you go —
+rough is fine. The <code>known-issues-intake</code> Codex agent
+(<a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.agents/agents/known-issues-intake.md" target="_blank" rel="noopener noreferrer" class=""><code>.agents/agents/known-issues-intake.md</code></a>)
+normalizes those notes into proper <code>known-issues.md</code> rows afterwards, so you
+do not have to format anything mid-test.</li>
+</ol>
+<p>Out of scope for this plan: <strong>KI-016 (Docusaurus documentation site)</strong> — owned by
+Codex on a separate branch.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="session-block-format">Session Block Format<a href="#session-block-format" class="hash-link" aria-label="Direct link to Session Block Format" title="Direct link to Session Block Format" translate="no">​</a></h2>
+<p>Each session uses the same shape:</p>
+<ul>
+<li class=""><strong>Goal</strong> — what &quot;verified&quot; means for this session.</li>
+<li class=""><strong>Setup / prerequisites</strong> — exact hardware, accounts, and config needed.</li>
+<li class=""><strong>Steps</strong> — ordered, repeatable actions.</li>
+<li class=""><strong>Measurements</strong> — numbers to capture for timing-sensitive paths.</li>
+<li class=""><strong>Pass / fail criteria</strong> — the bar for moving a KI toward <code>Verified</code>.</li>
+<li class=""><strong>Artifacts</strong> — what to save as evidence.</li>
+<li class=""><strong>KI rows touched</strong> — which register entries this session updates.</li>
+</ul>
+<p>Status vocabulary (<code>Unverified</code>, <code>Broken</code>, <code>Partial</code>, <code>Blocked</code>, <code>Verified</code>)
+matches <a class="" href="/pixelbooth-docs/reference/roadmap/known-issues#status-values"><code>known-issues.md</code></a>.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="session-0--bring-up-and-environment-record">Session 0 — Bring-Up And Environment Record<a href="#session-0--bring-up-and-environment-record" class="hash-link" aria-label="Direct link to Session 0 — Bring-Up And Environment Record" title="Direct link to Session 0 — Bring-Up And Environment Record" translate="no">​</a></h2>
+<p><strong>Goal:</strong> a running dev stack on the target Pi and a recorded baseline so later
+sessions are reproducible.</p>
+<p><strong>Setup / prerequisites:</strong></p>
+<ul>
+<li class="">Target Raspberry Pi with a fresh Raspberry Pi OS image.</li>
+<li class="">Repository cloned at the branch/commit under test.</li>
+<li class="">Network access from a second device (laptop/phone) on the same LAN.</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li class="">Review the editable variables, then run first-boot prep:
+<code>sudo bash ./pi-first-boot.sh</code> (see
+<a class="" href="/pixelbooth-docs/reference/getting-started/raspberry-pi-setup"><code>raspberry-pi-setup.md</code></a>).</li>
+<li class="">Run app/camera setup as the normal user: <code>./pi-pixelbooth-setup.sh setup</code>.</li>
+<li class="">Run <code>./pi-pixelbooth-setup.sh doctor</code> and read the report.</li>
+<li class="">Start the stack: <code>./pi-pixelbooth-setup.sh run</code>.</li>
+<li class="">From a second device, open Booth (<code>http://&lt;pi&gt;:5173/</code>),
+Admin (<code>http://&lt;pi&gt;:5173/admin</code>), and the cameras API
+(<code>http://&lt;pi&gt;:8000/api/v1/cameras</code>).</li>
+</ol>
+<p><strong>Measurements:</strong> none — this is a baseline, not a benchmark.</p>
+<p><strong>Pass / fail criteria:</strong> <code>doctor</code> reports the expected interpreters, venv, and
+camera tooling; Booth and Admin load over the LAN; the cameras API responds.</p>
+<p><strong>Artifacts:</strong> save <code>~/firstboot-report.txt</code>, the full <code>doctor</code> output, and a
+note of: Pi model, OS image, camera devices present, kiosk browser + version,
+and the app commit hash. This is the &quot;before testing&quot; record every later
+session refers back to.</p>
+<p><strong>KI rows touched:</strong> none directly; this is a precondition for Sessions 1–4.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="session-1--camera-spike">Session 1 — Camera Spike<a href="#session-1--camera-spike" class="hash-link" aria-label="Direct link to Session 1 — Camera Spike" title="Direct link to Session 1 — Camera Spike" translate="no">​</a></h2>
+<p><strong>Goal:</strong> confirm camera discovery, live preview, still capture, and the
+hardware trigger behave on the real Pi across every camera-availability state.</p>
+<p><strong>Setup / prerequisites:</strong></p>
+<ul>
+<li class="">Session 0 complete.</li>
+<li class="">One or more real cameras. Where possible, run the matrix below across:
+normal-only, wide-only, both, and no-real-camera.</li>
+<li class="">For KI-004: the physical capture button wired to the trigger path.</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li class=""><strong>USB / V4L2 (KI-001):</strong> with a USB/UVC webcam, run in USB mode
+(<code>PIXELBOOTH_CAMERA_BACKEND=usb PIXELBOOTH_USB_CAMERA_DEVICE=0 PIXELBOOTH_USB_CAMERA_ROLE=normal ./pi-pixelbooth-setup.sh run</code>). Confirm
+discovery, MJPEG preview stability, and still capture output.</li>
+<li class=""><strong>Dual CSI (KI-002):</strong> with Camera Module 3 normal + wide, run the default
+Picamera2 backend. Verify normal/wide discovery, the role→index mapping,
+single-camera degraded states (unplug one), dual-role behavior, and the
+capture handoff.</li>
+<li class=""><strong>Preview performance (KI-003):</strong> with a real feed at the documented 720p /
+~15fps budget, record the measurements below under normal booth lighting and
+load.</li>
+<li class=""><strong>Trigger follows role (KI-004):</strong> switch the selected preview role in the
+UI, fire the <strong>physical</strong> button, and confirm the capture used the selected
+role (compare captured metadata/output, not just the on-screen preview).</li>
+</ol>
+<p><strong>Measurements:</strong> preview FPS, end-to-end preview latency, preview bandwidth,
+CPU load during preview, and capture-to-result time. Note any difference between
+fake/local development and the Pi.</p>
+<p><strong>Pass / fail criteria:</strong> each available camera state previews and captures
+without crashing; a missing camera <strong>degrades</strong> rather than crashes; the
+physical trigger demonstrably uses the selected role.</p>
+<p><strong>Artifacts:</strong> a captured still per camera state, the measurement table, and any
+API error / diagnostic id seen.</p>
+<p><strong>KI rows touched:</strong> KI-001, KI-002, KI-003, KI-004.</p>
+<p><strong>Blocked sub-items (do not invent test steps):</strong></p>
+<ul>
+<li class=""><strong>KI-005 (preset fallback policy)</strong> — <code>Blocked</code> until the required / preferred
+/ fallback / unavailable role policy is defined. <em>Decision to resolve first:</em>
+what each preset does when its preferred camera role is absent. Capture that
+decision in <a class="" href="/pixelbooth-docs/reference/architecture/camera-lighting"><code>camera-lighting.md</code></a> before
+treating preset capture as testable.</li>
+<li class=""><strong>KI-006 (exposure metadata)</strong> — <code>Blocked</code>; exposure is a spike item. <em>Decision
+to resolve first:</em> which exposure settings and diagnostic metadata are worth
+capturing. Prototype on hardware, then document before writing a repeatable
+test.</li>
+</ul>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="session-2--media-render-re-verify">Session 2 — Media Render Re-Verify<a href="#session-2--media-render-re-verify" class="hash-link" aria-label="Direct link to Session 2 — Media Render Re-Verify" title="Direct link to Session 2 — Media Render Re-Verify" translate="no">​</a></h2>
+<p><strong>Goal:</strong> confirm the render fixes that landed off-device (ADR-0014..0017)
+actually produce browser-playable, correctly-sized output on a real Pi capture,
+and that the camera survives an app restart.</p>
+<p><strong>Setup / prerequisites:</strong></p>
+<ul>
+<li class="">Session 0 complete, with at least one real camera (Session 1 ideally passed).</li>
+<li class="">A browser to view kiosk + gallery playback.</li>
+<li class="">A known full-frame overlay asset configured.</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li class=""><strong>Video playback (KI-008):</strong> capture a video item, let it render, and play it
+back in both the kiosk and the gallery. Confirm the ffmpeg H.264 / <code>yuv420p</code>
+MP4 plays (the old <code>mp4v</code> output did not).</li>
+<li class=""><strong>GIF / boomerang feel (KI-009):</strong> capture a gif and a boomerang. Confirm the
+length and motion feel right at real Pi capture rates (frame-count / fps
+budget from ADR-0014: animation ≈ 2.0s, boomerang ≈ 2.8s, video ≈ 3.0s).
+Note whether the counts/fps need tuning to the actual capture rate.</li>
+<li class=""><strong>Overlay scaling (KI-014):</strong> apply a known full-frame overlay to a real
+capture and confirm it scales to the frame and composites correctly in the
+final (including an overlay with no alpha channel).</li>
+<li class=""><strong>Restart / lifecycle (KI-012):</strong> capture once, restart the app, and confirm
+the camera reacquires without unplugging. Then force a held device and
+confirm the user-safe lock diagnostic (with a diagnostic id) appears.</li>
+</ol>
+<p><strong>Measurements:</strong> capture-to-final render time per format; gif/boomerang/video
+output durations as actually produced.</p>
+<p><strong>Pass / fail criteria:</strong> video plays in both browsers; gif/boomerang durations
+match the budget within tuning tolerance; the overlay is correctly placed and
+scaled; the camera reacquires after restart; the lock diagnostic appears only
+when a device is genuinely held.</p>
+<p><strong>Artifacts:</strong> the rendered media ids, a screen recording or screenshot of
+playback, the overlaid final, and the lock diagnostic log line + id.</p>
+<p><strong>KI rows touched:</strong> KI-008, KI-009, KI-012, KI-014.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="session-3--sharing-and-qr-end-to-end">Session 3 — Sharing And QR End-To-End<a href="#session-3--sharing-and-qr-end-to-end" class="hash-link" aria-label="Direct link to Session 3 — Sharing And QR End-To-End" title="Direct link to Session 3 — Sharing And QR End-To-End" translate="no">​</a></h2>
+<p><strong>Goal:</strong> prove the full guest share path against a <strong>real</strong> remote and a phone
+that is <strong>not</strong> on the booth LAN.</p>
+<p><strong>Setup / prerequisites:</strong></p>
+<ul>
+<li class="">A configured, network-reachable share remote — self-hosted S3/MinIO first, or
+WebDAV/FTP/SFTP.</li>
+<li class="">A deployed static sharepage (<a href="https://github.com/Katrines-Kaelder/pixelbooth/tree/main/apps/sharepage" target="_blank" rel="noopener noreferrer" class=""><code>apps/sharepage</code></a>).</li>
+<li class="">A phone on mobile data (not the booth Wi-Fi).</li>
+<li class="">See <a class="" href="/pixelbooth-docs/reference/architecture/decisions/cloud-share-services-and-qr">ADR-0018</a>.</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li class="">Run <code>scripts/share-host-setup</code>
+(<a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/scripts/share-host-setup/sharehost.py" target="_blank" rel="noopener noreferrer" class=""><code>sharehost.py</code></a>) against the
+real MinIO/WebDAV host.</li>
+<li class="">In Admin, add the remote, designate it the <strong>share remote</strong>, and confirm the
+link preview.</li>
+<li class="">Capture an item and watch the sync outbox / upload job succeed.</li>
+<li class="">Watch the kiosk QR flip from &quot;SAVING…&quot; to a scannable code.</li>
+<li class="">Scan it from the phone on mobile data → open the grab page → press SAVE and
+confirm the media downloads.</li>
+<li class="">Re-share an already-shared item and confirm the deterministic keyed upload
+(<code>rclone copyto</code>) does not duplicate.</li>
+</ol>
+<p><strong>Measurements:</strong> capture → &quot;shared&quot; latency (the time the QR shows &quot;SAVING…&quot;);
+upload job duration.</p>
+<p><strong>Pass / fail criteria:</strong> the upload job succeeds; the QR becomes scannable; an
+off-LAN phone reaches the public URL and downloads the media; reshare dedupes.</p>
+<p><strong>Artifacts:</strong> the share remote config used (redact secrets), the <code>media.shared</code>
+event / media-share status, a photo of the scannable kiosk QR, and a screenshot
+of the grab page on the phone.</p>
+<p><strong>KI rows touched:</strong> KI-018.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="session-4--remote-transports">Session 4 — Remote Transports<a href="#session-4--remote-transports" class="hash-link" aria-label="Direct link to Session 4 — Remote Transports" title="Direct link to Session 4 — Remote Transports" translate="no">​</a></h2>
+<p><strong>Goal:</strong> validate the three non-rclone transports behind the common remote
+model against real endpoints.</p>
+<p><strong>Setup / prerequisites:</strong></p>
+<ul>
+<li class="">An Immich server reachable over the network plus an API key.</li>
+<li class="">An SSH host on the LAN with the Pi&#x27;s key installed.</li>
+<li class="">A real USB drive that can be mounted on the Pi.</li>
+<li class="">See <a class="" href="/pixelbooth-docs/reference/architecture/decisions/sync-transport-engines">ADR-0005</a>.</li>
+</ul>
+<p><strong>Steps:</strong></p>
+<ol>
+<li class=""><strong>Immich:</strong> configure the <code>immich</code> remote in Admin, run &quot;test remote&quot;, then a
+capture/sync. Confirm the asset appears in the Immich library and that a
+re-upload dedupes.</li>
+<li class=""><strong>rsync over SSH:</strong> configure the <code>rsync_sftp</code> remote, run &quot;test remote&quot;,
+then a capture/sync. Confirm files land on the SSH host and the key-auth path
+works under <code>BatchMode</code> (no interactive prompt).</li>
+<li class=""><strong>USB:</strong> with the drive mounted, configure the <code>usb</code> remote and run a
+capture/sync. Confirm the export tree appears on the drive. Then <strong>unmount</strong>
+and confirm the &quot;not mounted&quot; message shows.</li>
+</ol>
+<p><strong>Measurements:</strong> per-transport sync duration for one item.</p>
+<p><strong>Pass / fail criteria:</strong> each transport&#x27;s &quot;test remote&quot; passes; a capture lands
+at the destination; Immich dedupes; rsync runs non-interactively; USB shows the
+correct &quot;not mounted&quot; message when absent.</p>
+<p><strong>Artifacts:</strong> a screenshot/listing of the asset at each destination, the
+&quot;test remote&quot; result, and the USB &quot;not mounted&quot; message.</p>
+<p><strong>KI rows touched:</strong> KI-019.</p>
+<hr>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="coverage-gaps-to-confirm">Coverage Gaps To Confirm<a href="#coverage-gaps-to-confirm" class="hash-link" aria-label="Direct link to Coverage Gaps To Confirm" title="Direct link to Coverage Gaps To Confirm" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Printing.</strong> Stage 8 is titled &quot;Sync, QR, and Print&quot;, but there is no print
+known-issue and no print test session here. Confirm whether any print path
+exists yet; if it does, open a new <code>KI-###</code> and add a session. If it does not,
+it is future roadmap work, not a validation gap.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="after-each-session">After Each Session<a href="#after-each-session" class="hash-link" aria-label="Direct link to After Each Session" title="Direct link to After Each Session" translate="no">​</a></h2>
+<ul>
+<li class="">Drop findings into <a class="" href="/pixelbooth-docs/reference/roadmap/test-notes.inbox"><code>test-notes.inbox.md</code></a>.</li>
+<li class="">Run the <code>known-issues-intake</code> agent to normalize them into
+<a class="" href="/pixelbooth-docs/reference/roadmap/known-issues"><code>known-issues.md</code></a> (assign IDs, set status, write the next
+action). It edits the register in place — review and commit yourself.</li>
+<li class="">Update the owning architecture / roadmap doc if the expected behavior changed.</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/roadmap/test-plan.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#how-to-use-this-plan" class="table-of-contents__link toc-highlight">How To Use This Plan</a></li><li><a href="#session-block-format" class="table-of-contents__link toc-highlight">Session Block Format</a></li><li><a href="#session-0--bring-up-and-environment-record" class="table-of-contents__link toc-highlight">Session 0 — Bring-Up And Environment Record</a></li><li><a href="#session-1--camera-spike" class="table-of-contents__link toc-highlight">Session 1 — Camera Spike</a></li><li><a href="#session-2--media-render-re-verify" class="table-of-contents__link toc-highlight">Session 2 — Media Render Re-Verify</a></li><li><a href="#session-3--sharing-and-qr-end-to-end" class="table-of-contents__link toc-highlight">Session 3 — Sharing And QR End-To-End</a></li><li><a href="#session-4--remote-transports" class="table-of-contents__link toc-highlight">Session 4 — Remote Transports</a></li><li><a href="#coverage-gaps-to-confirm" class="table-of-contents__link toc-highlight">Coverage Gaps To Confirm</a></li><li><a href="#after-each-session" class="table-of-contents__link toc-highlight">After Each Session</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+</body>
+</html>

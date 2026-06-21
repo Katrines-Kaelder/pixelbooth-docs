@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Changelog | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/changelog"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Changelog | Pixelbooth Docs"><meta data-rh="true" name="description" content="All notable Pixelbooth changes are summarized here from the full git history."><meta data-rh="true" property="og:description" content="All notable Pixelbooth changes are summarized here from the full git history."><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/changelog"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/changelog" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/changelog" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Changelog","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/changelog"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.5a14e451.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.c23f4538.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -15,10 +15,310 @@
 <p>All notable Pixelbooth changes are summarized here from the full git history.</p>
 <p>This project does not currently use release tags, so entries are grouped by
 development stage and date range. The changelog was last refreshed against
-<code>origin/main</code> commit <code>9940a00</code> on 2026-06-17.</p>
+<code>origin/main</code> commit <code>449c482</code> on 2026-06-22.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="unreleased">Unreleased<a href="#unreleased" class="hash-link" aria-label="Direct link to Unreleased" title="Direct link to Unreleased" translate="no">​</a></h2>
-<h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-4-media-fixes-and-stage-8-phase-12-share-delivery---2026-06-16-to-2026-06-17">Stage 4 media fixes and Stage 8 Phase 1/2 share delivery - 2026-06-16 to 2026-06-17<a href="#stage-4-media-fixes-and-stage-8-phase-12-share-delivery---2026-06-16-to-2026-06-17" class="hash-link" aria-label="Direct link to Stage 4 media fixes and Stage 8 Phase 1/2 share delivery - 2026-06-16 to 2026-06-17" title="Direct link to Stage 4 media fixes and Stage 8 Phase 1/2 share delivery - 2026-06-16 to 2026-06-17" translate="no">​</a></h3>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="gallery-detail-swipe-hardening---2026-06-22">Gallery detail swipe hardening - 2026-06-22<a href="#gallery-detail-swipe-hardening---2026-06-22" class="hash-link" aria-label="Direct link to Gallery detail swipe hardening - 2026-06-22" title="Direct link to Gallery detail swipe hardening - 2026-06-22" translate="no">​</a></h3>
+<p><em>Off-hardware rework of KI-024; Pi touchscreen verification pending.</em></p>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed">Changed<a href="#changed" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<ul>
+<li class="">Reworked <code>MediaDetail</code> swipe from React touch events to <strong>Pointer Events</strong>
+with <code>touch-action: none</code> and a horizontal-dominance + threshold guard
+(KI-024). On a touchscreen the browser otherwise claims the horizontal pan as
+a native gesture, so the detail view &quot;did not react&quot; to swipes; pointer events
+also unify mouse-drag in dev. A vertical drag or a tap never navigates, and the
+newest/oldest hard stops are preserved.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="gallery-omits-media-with-missing-files---2026-06-22">Gallery omits media with missing files - 2026-06-22<a href="#gallery-omits-media-with-missing-files---2026-06-22" class="hash-link" aria-label="Direct link to Gallery omits media with missing files - 2026-06-22" title="Direct link to Gallery omits media with missing files - 2026-06-22" translate="no">​</a></h3>
+<p><em>Off-hardware implementation of KI-026; Pi verification pending.</em></p>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added--changed">Added / Changed<a href="#added--changed" class="hash-link" aria-label="Direct link to Added / Changed" title="Direct link to Added / Changed" translate="no">​</a></h4>
+<ul>
+<li class=""><code>GET /media</code> now omits completed items whose <code>final</code> byte file is missing on
+disk (KI-026): <code>MediaService.list_media</code> gained a <code>require_files</code> filter (a
+per-row stat on the returned page) so a catalog row that outlived its files
+never appears as a gallery tile that opens a 404. The booth &quot;PICS TAKEN&quot;
+counter (<code>COUNT(*)</code>) is intentionally left unfiltered.</li>
+<li class=""><code>GalleryCard</code> now falls back to an in-style poster when a thumbnail fails to
+load, covering the race where a file disappears after the list was fetched.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="configurable-inactivity-auto-return---2026-06-22">Configurable inactivity auto-return - 2026-06-22<a href="#configurable-inactivity-auto-return---2026-06-22" class="hash-link" aria-label="Direct link to Configurable inactivity auto-return - 2026-06-22" title="Direct link to Configurable inactivity auto-return - 2026-06-22" translate="no">​</a></h3>
+<p><em>Off-hardware implementation of KI-027; Pi no-touch verification pending.</em></p>
 <h4 class="anchor anchorTargetStickyNavbar_OywG" id="added">Added<a href="#added" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<ul>
+<li class="">Added operator settings <strong><code>booth.auto_return_enabled</code></strong> (default on) and
+<strong><code>booth.auto_return_seconds</code></strong> (default 45, range 5-600) that return abandoned
+guest screens to attract after no touch (KI-027). A new <code>useAutoReturn</code> hook in
+<code>BoothScreen</code> arms on the result/mode-select/error screens — <code>present</code> aborts the
+finished session, mode-select/error reset to attract — restarting on any
+pointer/touch/key event. Active capture phases (countdown/capture/record/
+processing) and attract are excluded so an in-progress session is never cut short.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="operator-control-for-crt-scanline-overlay---2026-06-22">Operator control for CRT scanline overlay - 2026-06-22<a href="#operator-control-for-crt-scanline-overlay---2026-06-22" class="hash-link" aria-label="Direct link to Operator control for CRT scanline overlay - 2026-06-22" title="Direct link to Operator control for CRT scanline overlay - 2026-06-22" translate="no">​</a></h3>
+<p><em>First increment of FR-004 (admin-editable theme controls); builds on KI-011.</em></p>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-1">Added<a href="#added-1" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<ul>
+<li class="">Added an admin-editable <strong><code>booth.crt_scanlines</code></strong> setting (<code>off</code> / <code>subtle</code> /
+<code>full</code>) controlling the guest-screen CRT scanline overlay. <code>full</code> keeps the
+deliberate per-phase treatment (strong in attract/idle, faded back during the
+capture flow — KI-011), <code>subtle</code> pins a faint uniform pattern, and <code>off</code> fully
+disables the overlay. Rendered frontend-side in <code>BoothStage</code> via a new pure
+<code>scanlineIntensity(mode, phase)</code> helper, and exposed in the admin Booth settings
+as a labelled select.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="admin-control-plane-runtime-settings-and-operator-telemetry---2026-06-17-to-2026-06-18">Admin control plane, runtime settings, and operator telemetry - 2026-06-17 to 2026-06-18<a href="#admin-control-plane-runtime-settings-and-operator-telemetry---2026-06-17-to-2026-06-18" class="hash-link" aria-label="Direct link to Admin control plane, runtime settings, and operator telemetry - 2026-06-17 to 2026-06-18" title="Direct link to Admin control plane, runtime settings, and operator telemetry - 2026-06-17 to 2026-06-18" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-2">Added<a href="#added-2" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<ul>
+<li class="">Rebuilt admin as a <strong>desktop-first control plane</strong> with top-level operator
+categories, category sidebars, a full-width dashboard landing page, dark/light
+admin theming, and a draft-based <strong>Save all changes</strong> settings workflow.</li>
+<li class="">Added a real <strong>Cameras</strong> admin panel and moved camera-specific controls out of
+generic settings forms, giving later preview/orientation/focus/exposure work a
+purpose-built home.</li>
+<li class="">Added runtime capture settings wired end-to-end:
+mode enable/disable flags for Photo, Collage, GIF/Boomerang, and Video;
+countdown timing; collage shot count; record duration; GIF/video playback fps;
+and guest-facing booth/gallery settings such as attract counters, gallery
+enablement, page size, newest-first ordering, and event profile fields.</li>
+<li class="">Added network/system settings and dashboard usage: event timezone drives the
+dashboard clock, <code>display_hostname</code> gives the booth a friendly device label,
+and <code>log_level</code> applies to the root logger on startup.</li>
+<li class="">Added richer Commander support: task descriptions in the UI, a gated
+expert-mode host command (<code>shell_exec</code>) with audit output
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/commander-expert-mode-and-scheduling">ADR-0019</a>),
+and scheduled allowlisted tasks that run through the same confirmation,
+timeout, status, and audit path as manual runs.</li>
+<li class="">Added system telemetry for the admin dashboard: CPU, RAM, temperature, uptime,
+network interfaces, Wi-Fi SSID, and fast dashboard-only metrics polling.</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed">Fixed<a href="#fixed" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<ul>
+<li class="">Reworked the admin dashboard into data-driven cards with clearer readiness
+signals, real camera names, a merged System card, better logo/home behavior,
+and improved readability/spacing across dense operator views.</li>
+<li class="">Replaced rough storage estimates with media-folder byte counts, per-format
+capacity prediction, and a more prominent storage card so opening-night risk
+is visible before the disk fills.</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-1">Changed<a href="#changed-1" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<ul>
+<li class="">Updated the admin architecture docs to match the implemented two-level
+navigation, settings model, dashboard scope, Commander posture, remote
+management, and future slots for lighting, print, logs, setup, and media
+operations.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="operations-validation-and-docs-site-maintenance---2026-06-17-to-2026-06-20">Operations, validation, and docs-site maintenance - 2026-06-17 to 2026-06-20<a href="#operations-validation-and-docs-site-maintenance---2026-06-17-to-2026-06-20" class="hash-link" aria-label="Direct link to Operations, validation, and docs-site maintenance - 2026-06-17 to 2026-06-20" title="Direct link to Operations, validation, and docs-site maintenance - 2026-06-17 to 2026-06-20" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-3">Added<a href="#added-3" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<ul>
+<li class="">Added a hardware validation test plan and test-notes inbox covering Pi setup,
+camera verification, media quality, sharing/QR, remote transports, and known
+issue intake, so booth testing can feed directly back into the roadmap.</li>
+<li class="">Added feature-request and known-issue intake workflows plus new roadmap items
+for overlay designer work, theme controls, and a WLED preset generator.</li>
+<li class="">Added a kiosk run mode and self-diagnosing Pi setup improvements so the setup
+script can launch the intended booth path more reliably on target hardware.</li>
+<li class="">Published the root changelog into the Docusaurus reference site and fixed the
+visual roadmap map to show stages 7, 8, 9, and 10 with contained horizontal
+scrolling and non-overlapping connectors.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-8-transport-completion-and-sharing-hardening---2026-06-17-to-2026-06-20">Stage 8 transport completion and sharing hardening - 2026-06-17 to 2026-06-20<a href="#stage-8-transport-completion-and-sharing-hardening---2026-06-17-to-2026-06-20" class="hash-link" aria-label="Direct link to Stage 8 transport completion and sharing hardening - 2026-06-17 to 2026-06-20" title="Direct link to Stage 8 transport completion and sharing hardening - 2026-06-17 to 2026-06-20" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-4">Added<a href="#added-4" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<ul>
+<li class="">Completed the Stage 8 remote transport set behind the common remote model:
+<strong>local folder</strong>, <strong>USB export</strong>, <strong>rclone</strong> cloud/self-hosted remotes
+(S3/MinIO, WebDAV, FTP, SFTP, and Google Drive), <strong>Immich native upload</strong>, and
+<strong>rsync over SSH</strong>. Google Drive and Immich are supported as backup/sync
+destinations; they are not the recommended public QR backend.</li>
+<li class="">Implemented the non-rclone transports in the service layer: Immich uploads via
+its native asset API with stable <code>deviceAssetId</code> idempotency; rsync uses SSH
+key auth in <code>BatchMode</code> for LAN/self-hosted targets; and USB export copies the
+media tree to a configured mounted drive path while leaving privileged
+mount/unmount to a host helper.</li>
+<li class="">Added typed admin remote forms with destination-specific fields, per-remote
+sync frequency, test actions, and write-only secret handling so stored
+credentials are redacted on read and preserved unless explicitly replaced
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/write-only-remote-secrets">ADR-0020</a>).</li>
+<li class="">Added the remote destination picker that exposes rclone backends as operator
+choices (<code>S3 / MinIO</code>, <code>Google Drive</code>, <code>WebDAV / Nextcloud</code>, <code>SFTP</code>, <code>FTP</code>)
+alongside Immich, rsync, USB, and local folder instead of hiding everything
+behind a generic rclone type.</li>
+<li class="">Added the operator QR sharing guide for configuring a share remote, deploying
+the static sharepage, setting the public URL, and testing upload-to-scan
+end-to-end.</li>
+<li class="">Added the validation test plan and issue/feature intake docs so hardware,
+sync, QR, and future stage findings can be captured consistently.</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-1">Fixed<a href="#fixed-1" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<ul>
+<li class="">Hardened sharepage deployment and rclone uploads for real object-store
+behavior: the admin can deploy <code>apps/sharepage/index.html</code> through the stored
+share remote (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/in-app-sharepage-deploy">ADR-0021</a>),
+QR links target <code>index.html</code> explicitly, MinIO/S3 defaults use path-style
+addressing and <code>us-east-1</code>, the API/Pi setup installs the official rclone
+binary, and rclone is forced to HTTP/1.1 for reverse proxies that drop HTTP/2
+request bodies.</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-2">Changed<a href="#changed-2" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<ul>
+<li class="">Refreshed the admin control-plane docs for the desktop-first two-level admin
+layout, Cameras panel, real dashboard metrics, Sharing/Remotes workflow,
+Commander expert mode and scheduled tasks (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/commander-expert-mode-and-scheduling">ADR-0019</a>),
+and the current settings model.</li>
+<li class="">Updated roadmap, known-issues, API, operator, and Docusaurus reference docs so
+Stage 8 is recorded as active with sync/QR largely implemented and print still
+remaining.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="continuous-autofocus-and-sensor-exposure-controls---2026-06-22">Continuous autofocus and sensor exposure controls - 2026-06-22<a href="#continuous-autofocus-and-sensor-exposure-controls---2026-06-22" class="hash-link" aria-label="Direct link to Continuous autofocus and sensor exposure controls - 2026-06-22" title="Direct link to Continuous autofocus and sensor exposure controls - 2026-06-22" translate="no">​</a></h3>
+<p><em>Hardware-verified on the target Pi (2026-06-22); KI-023 resolved.</em></p>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-5">Added<a href="#added-5" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<ul>
+<li class="">Enabled <strong>autofocus</strong> on the CSI Camera Module 3 cameras (ADR-0025, KI-023): the
+Picamera2 adapter applies <code>AfMode=Continuous</code> + <code>AfSpeed=Fast</code> by default so the lens
+tracks guests as they move into frame, with an admin-editable focus mode/range and a
+<strong>manual <code>lens_position</code> lock</strong> (dioptres) as an escape hatch for low-contrast club
+lighting where continuous AF hunts.</li>
+<li class="">Added <strong>sensor-side exposure/white-balance controls</strong> — the camera-only slice of the
+exposure work (ADR-0025, partial KI-006): the sensor&#x27;s own AEC/AGC/AWB plus
+<code>ae_enable</code>, <code>ae_metering</code>, <code>ae_exposure_mode</code>, <code>exposure_value</code> (EV), an optional
+manual <code>exposure_time_us</code>/<code>analogue_gain</code> pair, and <code>awb_enable</code>/<code>awb_mode</code>. The
+coordinated ring-light/metering <code>ExposureService</code> stays deferred to Stage 5.</li>
+<li class="">Extended the typed <code>camera</code> settings section with the focus/exposure fields, read live
+by the adapter via a <code>CameraControls</code> value object (mirroring <code>PreviewTuning</code>), so an
+operator edit applies without a restart and a patch re-applies to an open camera in
+place. The admin Cameras form gained Focus and Exposure &amp; white-balance field groups.</li>
+<li class="">Added <strong>focus/exposure metadata</strong> (<code>lens_position</code>, <code>focus_fom</code>, <code>exposure_time_us</code>,
+analogue/digital gain, <code>lux</code>, <code>colour_temperature</code>) to <code>GET /system/metrics</code>, surfaced
+on the dashboard Cameras card next to the measured fps, so an operator can verify
+autofocus and exposure while tuning on hardware.</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-3">Changed<a href="#changed-3" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<ul>
+<li class=""><code>ensure_seeded</code> now backfills <strong>missing fields within existing sections</strong> (not just
+whole missing sections, KI-003), so an older settings document self-heals the new
+focus/exposure fields on startup. Bumped <code>SETTINGS_SCHEMA_VERSION</code> to 2.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="low-latency-csi-live-preview---2026-06-21">Low-latency CSI live preview - 2026-06-21<a href="#low-latency-csi-live-preview---2026-06-21" class="hash-link" aria-label="Direct link to Low-latency CSI live preview - 2026-06-21" title="Direct link to Low-latency CSI live preview - 2026-06-21" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-6">Added<a href="#added-6" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<ul>
+<li class="">Added a SQLite-backed, admin-editable <strong><code>camera</code> settings section</strong> (preview fps,
+lores size, preview <code>main</code> size, and image flip) that the Picamera2 adapter reads
+live, so operator edits apply without a restart — a successful patch reconfigures any
+open camera in place (ADR-0024, KI-003). This is the correct home for the preview
+tuning that was briefly (and wrongly) env vars; it mirrors how the render output sizes
+live in <code>CaptureSettings</code> (ADR-0017). The section is admin-only (absent from the guest
+config view).</li>
+<li class="">Added an <strong>image flip</strong> via a libcamera <code>Transform</code>: <code>flip_horizontal</code> (mirror),
+<code>flip_vertical</code>, and a <code>flip_scope</code> — <code>all</code> flips the saved still too (camera mounted
+mirrored/rotated), <code>preview_only</code> mirrors just the live preview (selfie-mirror UX, the
+saved photo stays un-mirrored). Edited on the new Cameras settings form, with inline
+horizontal/vertical quick toggles on the admin dashboard.</li>
+<li class="">Added the <strong>measured live-preview producer fps</strong> to <code>GET /system/metrics</code> (computed
+from the hardware encoder&#x27;s real frame timing) and surfaced it on the dashboard
+Cameras card, so an operator can watch the actual frame rate while tuning the preview.</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-2">Fixed<a href="#fixed-2" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<ul>
+<li class="">Fixed the preview looking <strong>cropped/zoomed versus the saved photo</strong> (KI-003): the
+preview <code>main</code> default was <code>1536x864</code>, a <em>cropped</em> IMX708 readout, while the still
+captures the full-FoV native sensor. The default is now the full-FoV 2x2-binned
+<code>2304x1296</code> mode (~56fps), so the preview frames the same scene as the capture.</li>
+<li class="">Fixed the admin <strong>&quot;Could not load camera settings&quot;</strong> on databases seeded before the
+<code>camera</code> section existed: <code>ensure_seeded</code> now backfills any top-level section added
+since the stored document was written (and re-persists it), so older databases
+self-heal on startup instead of returning an incomplete settings document.</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-4">Changed<a href="#changed-4" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<ul>
+<li class="">Reworked the Picamera2 (CSI) live preview for a realtime feed (KI-003,
+<a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-preview-capture-mode-split">ADR-0024</a>).
+The camera previously idled in a continuous native-resolution still config, which
+pinned the IMX708 sensor to its ~14fps full-res readout and starved the <code>lores</code>
+preview, and pulled frames via per-frame <code>capture_file</code>. It now idles in a light
+<code>create_video_configuration</code> (small <code>main</code> → fast sensor mode) and <code>switch_mode</code>s to
+the native still config only for capture, so the captured ORIGINAL stays native while
+idle preview runs fast. Live preview is served by a continuous hardware <code>MJPEGEncoder</code>
+writing a latest-frame buffer, so the stream yields the freshest frame instead of
+re-encoding per frame. Preview fps/size are now the runtime <code>camera</code> settings above
+(<code>preview_fps</code> default 30); the env <code>Settings</code> keep only the USB/fake bootstrap preview
+budget. The <code>CameraAdapter</code> protocol gains <code>measured_fps</code>/<code>refresh_preview_tuning</code>
+(no-ops on fake/USB); the MJPEG endpoint is unchanged. <strong>Hardware-verified on the Pi
+(2026-06-21):</strong> preview frames the same scene as the capture, runs at 30 fps, latency
+much improved and acceptable, CPU fine, flip works — KI-003 resolved.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="in-app-sharepage-deploy---2026-06-20">In-app sharepage deploy - 2026-06-20<a href="#in-app-sharepage-deploy---2026-06-20" class="hash-link" aria-label="Direct link to In-app sharepage deploy - 2026-06-20" title="Direct link to In-app sharepage deploy - 2026-06-20" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-7">Added<a href="#added-7" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<ul>
+<li class="">Added a <strong>Deploy sharepage</strong> action on the share remote&#x27;s admin row that uploads
+<code>apps/sharepage/index.html</code> to the remote&#x27;s root using the remote&#x27;s stored
+credentials — no second tool and no re-typed secret. New endpoint
+<code>POST /sync/remotes/{id}/deploy-sharepage</code>, a <code>PIXELBOOTH_SHAREPAGE_PATH</code> setting
+(defaults to the repo-tree copy), and <a class="" href="/pixelbooth-docs/reference/architecture/decisions/in-app-sharepage-deploy">ADR-0021</a>.
+The <code>scripts/share-host-setup</code> CLI helper is now the bootstrap/CI fallback.</li>
+</ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-3">Fixed<a href="#fixed-3" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<ul>
+<li class="">Forced the rclone transport to HTTP/1.1 (<code>GODEBUG=http2client=0</code>) so uploads
+survive S3-compatible reverse proxies that drop HTTP/2 request bodies (e.g.
+MinIO behind Caddy returning a 502 on PUT while listing succeeds).</li>
+<li class="">Defaulted the S3 backend to <strong>path-style addressing</strong> + region <strong>us-east-1</strong>
+(both overridable, exposed on the remote form), fixing a <code>PermanentRedirect</code>
+on upload to MinIO/AIStor (virtual-host addressing is 308-redirected without
+<code>MINIO_DOMAIN</code>, and a mismatched signed region scope is rejected).</li>
+<li class="">Installed the <strong>official</strong> rclone binary in the Pi setup script and API image
+instead of the stale Debian <code>apt</code> package, which fails to upload to modern S3
+servers (e.g. MinIO AIStor).</li>
+<li class="">Pointed the sharepage QR link at <code>index.html</code> explicitly
+(<code>{sharepage_url}/index.html?id=…</code>) so it opens on object stores, which don&#x27;t
+serve a directory index; on S3/MinIO <code>sharepage_url</code> must include the bucket.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="full-resolution-pi-stills-end-to-end-ki-022---2026-06-21">Full-resolution Pi stills end-to-end (KI-022) - 2026-06-21<a href="#full-resolution-pi-stills-end-to-end-ki-022---2026-06-21" class="hash-link" aria-label="Direct link to Full-resolution Pi stills end-to-end (KI-022) - 2026-06-21" title="Direct link to Full-resolution Pi stills end-to-end (KI-022) - 2026-06-21" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-4">Fixed<a href="#fixed-4" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<ul>
+<li class="">Fixed the CSI preview/capture crashing on the native capture-size default: the
+Picamera2 adapter passed <code>main=None</code> to <code>create_still_configuration</code> to mean
+&quot;native&quot;, but Picamera2 needs an empty dict there (<code>main=None</code> crashes in
+<code>align_stream</code>). Pass <code>main={}</code>; the test fake now rejects <code>None</code> to guard it.</li>
+<li class="">Fixed the processed final still being 1280x720 while the ORIGINAL was full
+resolution: the render composed the still from the downscaled instant <code>preview</code>
+variant instead of the full-res <code>original</code>, capping the final at the preview
+size regardless of the (native) still output box. The render now sources the
+still/fallback frame from the <code>original</code>, with a regression test asserting the
+final keeps native dimensions.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="shutdown-reworked-to-the-reference-app-approach-after-on-pi-testing-ki-012---2026-06-21">Shutdown reworked to the reference-app approach after on-Pi testing (KI-012) - 2026-06-21<a href="#shutdown-reworked-to-the-reference-app-approach-after-on-pi-testing-ki-012---2026-06-21" class="hash-link" aria-label="Direct link to Shutdown reworked to the reference-app approach after on-Pi testing (KI-012) - 2026-06-21" title="Direct link to Shutdown reworked to the reference-app approach after on-Pi testing (KI-012) - 2026-06-21" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-5">Fixed<a href="#fixed-5" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<ul>
+<li class="">Reworked app shutdown to the reference photobooth&#x27;s proven workaround for
+uvicorn #1579 after the first (cooperative-stop) attempt proved fragile on the
+Pi and made shutdown worse. The booth keeps two endless responses open (the MJPEG
+preview and the <code>/events</code> WebSocket); the <code>python -m pixelbooth</code> entrypoint now
+sets <code>server.force_exit = True</code> so uvicorn <strong>abandons</strong> both on the first signal
+instead of waiting them out — no graceful-drain stall and no force-cancelled
+<code>CancelledError</code> tracebacks.</li>
+<li class="">Because <code>force_exit</code> skips the FastAPI lifespan, the entrypoint&#x27;s <code>handle_exit</code>
+now releases the cameras synchronously (<code>CameraService.close()</code>) in the signal
+handler, so a restart can still reacquire the device.</li>
+<li class="">Fixed the process <strong>hanging after</strong> its last shutdown log line and never exiting:
+a libcamera/V4L2 worker thread outlives <code>Picamera2.close()</code> and, being non-daemon,
+blocks the interpreter&#x27;s own shutdown forever — leaving the orphaned process alive
+and the camera fds held, which defeats the restart KI-012 is about. <code>main()</code> now
+<code>os._exit(0)</code>s once the server returns (the cameras were already released). See the
+revised ADR-0023.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="graceful-shutdown-that-releases-the-camera-on-the-first-ctrlc-ki-012---2026-06-21">Graceful shutdown that releases the camera on the first Ctrl+C (KI-012) - 2026-06-21<a href="#graceful-shutdown-that-releases-the-camera-on-the-first-ctrlc-ki-012---2026-06-21" class="hash-link" aria-label="Direct link to Graceful shutdown that releases the camera on the first Ctrl+C (KI-012) - 2026-06-21" title="Direct link to Graceful shutdown that releases the camera on the first Ctrl+C (KI-012) - 2026-06-21" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-6">Fixed<a href="#fixed-6" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<ul>
+<li class="">Fixed the Pi being unable to restart the app without a reboot: an open live
+preview (<code>stream.mjpg</code>) is an endless response, so a bare <code>uvicorn</code> launch hung
+on the first <code>Ctrl+C</code> and a forced second interrupt skipped the lifespan that
+releases the camera, leaking the locked CSI/V4L2 handle (uvicorn #1579). The Pi
+now runs the new <code>python -m pixelbooth</code> entrypoint, which signals preview streams
+to stop on the <strong>first</strong> signal (<code>CameraService.request_preview_stop()</code>, a one-way
+event the preview loop checks each frame and ends without reopening), so streams
+close, connections drain, and the lifespan releases the cameras; a bounded
+<code>timeout_graceful_shutdown</code> backstops a wedged stream. New <code>PIXELBOOTH_HOST</code> /
+<code>PIXELBOOTH_PORT</code> bootstrap settings and <a class="" href="/pixelbooth-docs/reference/architecture/decisions/graceful-shutdown-camera-release">ADR-0023</a>.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-4-media-fixes-and-stage-8-phase-12-share-delivery---2026-06-16-to-2026-06-17">Stage 4 media fixes and Stage 8 Phase 1/2 share delivery - 2026-06-16 to 2026-06-17<a href="#stage-4-media-fixes-and-stage-8-phase-12-share-delivery---2026-06-16-to-2026-06-17" class="hash-link" aria-label="Direct link to Stage 4 media fixes and Stage 8 Phase 1/2 share delivery - 2026-06-16 to 2026-06-17" title="Direct link to Stage 4 media fixes and Stage 8 Phase 1/2 share delivery - 2026-06-16 to 2026-06-17" translate="no">​</a></h3>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-8">Added<a href="#added-8" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added the operator-facing media file-store layout, per-format capture-size
 contract, runtime-editable capture sizes, and ADRs covering the Stage 4 render
@@ -44,14 +344,14 @@ helper that deploys the page and prints the admin values operators need.</li>
 <li class="">Added live share QR panels in the kiosk Present screen and gallery detail, so
 the booth can move from &quot;saving&quot; to a scannable QR after the upload is ready.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed">Fixed<a href="#fixed" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-7">Fixed<a href="#fixed-7" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
 <ul>
 <li class="">Fixed several Stage 4 media quality issues: browser-playable H.264 video,
 Pillow-core overlay compositing, scanline intensity during active capture,
 camera release on shutdown, and operator-facing capture-size handling.</li>
 <li class="">Fixed admin typography legibility through theme-scoped font tokens.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed">Changed<a href="#changed" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-5">Changed<a href="#changed-5" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Refreshed the roadmap, known-issues register, and architecture docs for the
 Stage 8 Phase 1 share/sync services and Phase 2 QR path, including ADR-0018
@@ -60,7 +360,7 @@ for cloud/self-hosted sharing.</li>
 decision.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-4-follow-ups-and-composed-gallery-polish---2026-06-15">Stage 4 follow-ups and composed gallery polish - 2026-06-15<a href="#stage-4-follow-ups-and-composed-gallery-polish---2026-06-15" class="hash-link" aria-label="Direct link to Stage 4 follow-ups and composed gallery polish - 2026-06-15" title="Direct link to Stage 4 follow-ups and composed gallery polish - 2026-06-15" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-1">Added<a href="#added-1" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-9">Added<a href="#added-9" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added a dedicated gallery entry point from the booth attract screen, making
 captured media easier for guests to browse without entering the capture flow.</li>
@@ -74,7 +374,7 @@ tracking.</li>
 <li class="">Added project skills and memory notes for the next UI design pass and Stage 4
 guest composed-UX planning.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-1">Changed<a href="#changed-1" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-6">Changed<a href="#changed-6" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Refreshed Stage 4 documentation, roadmap status, and project status to reflect
 composed capture and gallery progress.</li>
@@ -83,7 +383,7 @@ gallery redesign issue.</li>
 <li class="">Pulled the latest <code>main</code> history into the media-docs follow-up branch.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-4-composed-capture-and-documentation-publishing---2026-06-14-to-2026-06-15">Stage 4 composed capture and documentation publishing - 2026-06-14 to 2026-06-15<a href="#stage-4-composed-capture-and-documentation-publishing---2026-06-14-to-2026-06-15" class="hash-link" aria-label="Direct link to Stage 4 composed capture and documentation publishing - 2026-06-14 to 2026-06-15" title="Direct link to Stage 4 composed capture and documentation publishing - 2026-06-14 to 2026-06-15" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-2">Added<a href="#added-2" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-10">Added<a href="#added-10" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added ADR-0013 for composed-capture choreography and implemented per-format
 capture behavior in the session service.</li>
@@ -94,7 +394,7 @@ types to the generated contract.</li>
 <li class="">Added ADR-0012 for composed media, event overlays, and OpenAPI type generation.</li>
 <li class="">Linked hosted documentation from the repository README.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-2">Changed<a href="#changed-2" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-7">Changed<a href="#changed-7" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Refreshed the Docusaurus site presentation with compact footer treatment,
 improved status views, fixed booth-preview scaling, and a clearer split between
@@ -105,21 +405,21 @@ source docs and the published presentation site.</li>
 publishing, renamed workflow labeling, and deploy-key hardening.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-4-media-processing-foundation---2026-06-14">Stage 4 media-processing foundation - 2026-06-14<a href="#stage-4-media-processing-foundation---2026-06-14" class="hash-link" aria-label="Direct link to Stage 4 media-processing foundation - 2026-06-14" title="Direct link to Stage 4 media-processing foundation - 2026-06-14" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-3">Added<a href="#added-3" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-11">Added<a href="#added-11" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added a media catalog, shared job queue, render pipeline, and visible media
 outputs as the first Stage 4 media-processing foundation.</li>
 <li class="">Added overlay-aware rendering and the first guest gallery frontend.</li>
 <li class="">Added the shared job-queue decision document.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-3">Changed<a href="#changed-3" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-8">Changed<a href="#changed-8" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Advanced the project from camera/session foundations into media-processing
 infrastructure with separate original, preview, rendered, and gallery-visible
 concerns.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="docusaurus-documentation-site---2026-06-14">Docusaurus documentation site - 2026-06-14<a href="#docusaurus-documentation-site---2026-06-14" class="hash-link" aria-label="Direct link to Docusaurus documentation site - 2026-06-14" title="Direct link to Docusaurus documentation site - 2026-06-14" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-4">Added<a href="#added-4" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-12">Added<a href="#added-12" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added the Docusaurus documentation site under <code>apps/docs</code> for a curated public
 documentation view.</li>
@@ -127,7 +427,7 @@ documentation view.</li>
 publishing support.</li>
 <li class="">Added a Codex docs branch updater agent.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-4">Changed<a href="#changed-4" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-9">Changed<a href="#changed-9" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Hardened docs deployment key handling, including support for base64-encoded
 deploy key secrets.</li>
@@ -135,20 +435,20 @@ deploy key secrets.</li>
 publishing flow.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-36-booth-visual-fidelity---2026-06-14">Stage 3.6 booth visual fidelity - 2026-06-14<a href="#stage-36-booth-visual-fidelity---2026-06-14" class="hash-link" aria-label="Direct link to Stage 3.6 booth visual fidelity - 2026-06-14" title="Direct link to Stage 3.6 booth visual fidelity - 2026-06-14" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-5">Added<a href="#added-5" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-13">Added<a href="#added-13" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Rebuilt the booth attract screen around the arcade visual handoff.</li>
 <li class="">Rebuilt mode selection to match the handoff arcade design.</li>
 <li class="">Rebuilt countdown, processing, and result/present screens for the booth flow.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-5">Changed<a href="#changed-5" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-10">Changed<a href="#changed-10" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Disabled the guest review step to keep the capture path more direct.</li>
 <li class="">Pulled current <code>main</code> changes into the booth visual-fidelity branch before it
 landed.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-35-session-orchestration---2026-06-13-to-2026-06-14">Stage 3.5 session orchestration - 2026-06-13 to 2026-06-14<a href="#stage-35-session-orchestration---2026-06-13-to-2026-06-14" class="hash-link" aria-label="Direct link to Stage 3.5 session orchestration - 2026-06-13 to 2026-06-14" title="Direct link to Stage 3.5 session orchestration - 2026-06-13 to 2026-06-14" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-6">Added<a href="#added-6" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-14">Added<a href="#added-14" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added backend <code>SessionService</code> capture orchestration for the first capture
 session state machine.</li>
@@ -158,13 +458,13 @@ states instead of only previewing a camera feed.</li>
 <li class="">Added a Docusaurus planning and workflow split to separate docs-site work from
 product implementation work.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-6">Changed<a href="#changed-6" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-11">Changed<a href="#changed-11" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Moved the booth from preview-only behavior toward an explicit session-driven
 capture workflow.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-3-camera-hardware-foundations---2026-06-12-to-2026-06-13">Stage 3 camera hardware foundations - 2026-06-12 to 2026-06-13<a href="#stage-3-camera-hardware-foundations---2026-06-12-to-2026-06-13" class="hash-link" aria-label="Direct link to Stage 3 camera hardware foundations - 2026-06-12 to 2026-06-13" title="Direct link to Stage 3 camera hardware foundations - 2026-06-12 to 2026-06-13" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-7">Added<a href="#added-7" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-15">Added<a href="#added-15" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added a USB/V4L2 camera adapter with live MJPEG preview support.</li>
 <li class="">Added a preview-only booth kiosk surface connected to the live MJPEG preview.</li>
@@ -176,7 +476,7 @@ the booth/admin flow.</li>
 <li class="">Added Raspberry Pi Connect boot persistence in the first-boot script.</li>
 <li class="">Added hardware budget tracking to the README.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-1">Fixed<a href="#fixed-1" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="fixed-8">Fixed<a href="#fixed-8" class="hash-link" aria-label="Direct link to Fixed" title="Direct link to Fixed" translate="no">​</a></h4>
 <ul>
 <li class="">Fixed USB preview blanking by making camera availability checks avoid taking
 over an already-open camera.</li>
@@ -184,13 +484,13 @@ over an already-open camera.</li>
 competing camera handles.</li>
 <li class="">Made E2E ports overridable to reduce local dev-server collisions.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-7">Changed<a href="#changed-7" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-12">Changed<a href="#changed-12" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Recorded Stage 3 progress, hardware validation notes, and known follow-ups in
 project memory.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="stage-25-persistence-and-admin-control-plane---2026-06-12">Stage 2.5 persistence and admin control plane - 2026-06-12<a href="#stage-25-persistence-and-admin-control-plane---2026-06-12" class="hash-link" aria-label="Direct link to Stage 2.5 persistence and admin control plane - 2026-06-12" title="Direct link to Stage 2.5 persistence and admin control plane - 2026-06-12" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-8">Added<a href="#added-8" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-16">Added<a href="#added-16" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added the SQLite persistence foundation for local metadata storage.</li>
 <li class="">Added the admin gate, logging substrate, configuration service, and asset
@@ -198,12 +498,12 @@ services.</li>
 <li class="">Added overlay, command, and sync-remote services.</li>
 <li class="">Added the admin control-plane frontend.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-8">Changed<a href="#changed-8" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-13">Changed<a href="#changed-13" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Disabled automatic opening of the Serena web dashboard during development.</li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="planning-architecture-and-design-foundation---2026-06-10-to-2026-06-12">Planning, architecture, and design foundation - 2026-06-10 to 2026-06-12<a href="#planning-architecture-and-design-foundation---2026-06-10-to-2026-06-12" class="hash-link" aria-label="Direct link to Planning, architecture, and design foundation - 2026-06-10 to 2026-06-12" title="Direct link to Planning, architecture, and design foundation - 2026-06-10 to 2026-06-12" translate="no">​</a></h3>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-9">Added<a href="#added-9" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="added-17">Added<a href="#added-17" class="hash-link" aria-label="Direct link to Added" title="Direct link to Added" translate="no">​</a></h4>
 <ul>
 <li class="">Added the initial Python and React-oriented <code>.gitignore</code>.</li>
 <li class="">Added the initial project setup, architecture notes, definitions, and
@@ -212,11 +512,11 @@ deliberate implementation scaffold.</li>
 touchscreen design brief.</li>
 <li class="">Added the booth touchscreen design prototype as a reference artifact.</li>
 </ul>
-<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-9">Changed<a href="#changed-9" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="changed-14">Changed<a href="#changed-14" class="hash-link" aria-label="Direct link to Changed" title="Direct link to Changed" translate="no">​</a></h4>
 <ul>
 <li class="">Corrected planning docs and connected the frontend reference more explicitly
 to the product direction.</li>
 <li class="">Made the booth prototype the explicit design source for later roadmap stages.</li>
-</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/pixelbooth-docs/reference"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Pixelbooth Source Docs Index</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/pixelbooth-docs/reference/getting-started/local-development"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Local Development</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#unreleased" class="table-of-contents__link toc-highlight">Unreleased</a><ul><li><a href="#stage-4-media-fixes-and-stage-8-phase-12-share-delivery---2026-06-16-to-2026-06-17" class="table-of-contents__link toc-highlight">Stage 4 media fixes and Stage 8 Phase 1/2 share delivery - 2026-06-16 to 2026-06-17</a></li><li><a href="#stage-4-follow-ups-and-composed-gallery-polish---2026-06-15" class="table-of-contents__link toc-highlight">Stage 4 follow-ups and composed gallery polish - 2026-06-15</a></li><li><a href="#stage-4-composed-capture-and-documentation-publishing---2026-06-14-to-2026-06-15" class="table-of-contents__link toc-highlight">Stage 4 composed capture and documentation publishing - 2026-06-14 to 2026-06-15</a></li><li><a href="#stage-4-media-processing-foundation---2026-06-14" class="table-of-contents__link toc-highlight">Stage 4 media-processing foundation - 2026-06-14</a></li><li><a href="#docusaurus-documentation-site---2026-06-14" class="table-of-contents__link toc-highlight">Docusaurus documentation site - 2026-06-14</a></li><li><a href="#stage-36-booth-visual-fidelity---2026-06-14" class="table-of-contents__link toc-highlight">Stage 3.6 booth visual fidelity - 2026-06-14</a></li><li><a href="#stage-35-session-orchestration---2026-06-13-to-2026-06-14" class="table-of-contents__link toc-highlight">Stage 3.5 session orchestration - 2026-06-13 to 2026-06-14</a></li><li><a href="#stage-3-camera-hardware-foundations---2026-06-12-to-2026-06-13" class="table-of-contents__link toc-highlight">Stage 3 camera hardware foundations - 2026-06-12 to 2026-06-13</a></li><li><a href="#stage-25-persistence-and-admin-control-plane---2026-06-12" class="table-of-contents__link toc-highlight">Stage 2.5 persistence and admin control plane - 2026-06-12</a></li><li><a href="#planning-architecture-and-design-foundation---2026-06-10-to-2026-06-12" class="table-of-contents__link toc-highlight">Planning, architecture, and design foundation - 2026-06-10 to 2026-06-12</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/pixelbooth-docs/reference"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Pixelbooth Source Docs Index</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/pixelbooth-docs/reference/getting-started/local-development"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Local Development</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#unreleased" class="table-of-contents__link toc-highlight">Unreleased</a><ul><li><a href="#gallery-detail-swipe-hardening---2026-06-22" class="table-of-contents__link toc-highlight">Gallery detail swipe hardening - 2026-06-22</a></li><li><a href="#gallery-omits-media-with-missing-files---2026-06-22" class="table-of-contents__link toc-highlight">Gallery omits media with missing files - 2026-06-22</a></li><li><a href="#configurable-inactivity-auto-return---2026-06-22" class="table-of-contents__link toc-highlight">Configurable inactivity auto-return - 2026-06-22</a></li><li><a href="#operator-control-for-crt-scanline-overlay---2026-06-22" class="table-of-contents__link toc-highlight">Operator control for CRT scanline overlay - 2026-06-22</a></li><li><a href="#admin-control-plane-runtime-settings-and-operator-telemetry---2026-06-17-to-2026-06-18" class="table-of-contents__link toc-highlight">Admin control plane, runtime settings, and operator telemetry - 2026-06-17 to 2026-06-18</a></li><li><a href="#operations-validation-and-docs-site-maintenance---2026-06-17-to-2026-06-20" class="table-of-contents__link toc-highlight">Operations, validation, and docs-site maintenance - 2026-06-17 to 2026-06-20</a></li><li><a href="#stage-8-transport-completion-and-sharing-hardening---2026-06-17-to-2026-06-20" class="table-of-contents__link toc-highlight">Stage 8 transport completion and sharing hardening - 2026-06-17 to 2026-06-20</a></li><li><a href="#continuous-autofocus-and-sensor-exposure-controls---2026-06-22" class="table-of-contents__link toc-highlight">Continuous autofocus and sensor exposure controls - 2026-06-22</a></li><li><a href="#low-latency-csi-live-preview---2026-06-21" class="table-of-contents__link toc-highlight">Low-latency CSI live preview - 2026-06-21</a></li><li><a href="#in-app-sharepage-deploy---2026-06-20" class="table-of-contents__link toc-highlight">In-app sharepage deploy - 2026-06-20</a></li><li><a href="#full-resolution-pi-stills-end-to-end-ki-022---2026-06-21" class="table-of-contents__link toc-highlight">Full-resolution Pi stills end-to-end (KI-022) - 2026-06-21</a></li><li><a href="#shutdown-reworked-to-the-reference-app-approach-after-on-pi-testing-ki-012---2026-06-21" class="table-of-contents__link toc-highlight">Shutdown reworked to the reference-app approach after on-Pi testing (KI-012) - 2026-06-21</a></li><li><a href="#graceful-shutdown-that-releases-the-camera-on-the-first-ctrlc-ki-012---2026-06-21" class="table-of-contents__link toc-highlight">Graceful shutdown that releases the camera on the first Ctrl+C (KI-012) - 2026-06-21</a></li><li><a href="#stage-4-media-fixes-and-stage-8-phase-12-share-delivery---2026-06-16-to-2026-06-17" class="table-of-contents__link toc-highlight">Stage 4 media fixes and Stage 8 Phase 1/2 share delivery - 2026-06-16 to 2026-06-17</a></li><li><a href="#stage-4-follow-ups-and-composed-gallery-polish---2026-06-15" class="table-of-contents__link toc-highlight">Stage 4 follow-ups and composed gallery polish - 2026-06-15</a></li><li><a href="#stage-4-composed-capture-and-documentation-publishing---2026-06-14-to-2026-06-15" class="table-of-contents__link toc-highlight">Stage 4 composed capture and documentation publishing - 2026-06-14 to 2026-06-15</a></li><li><a href="#stage-4-media-processing-foundation---2026-06-14" class="table-of-contents__link toc-highlight">Stage 4 media-processing foundation - 2026-06-14</a></li><li><a href="#docusaurus-documentation-site---2026-06-14" class="table-of-contents__link toc-highlight">Docusaurus documentation site - 2026-06-14</a></li><li><a href="#stage-36-booth-visual-fidelity---2026-06-14" class="table-of-contents__link toc-highlight">Stage 3.6 booth visual fidelity - 2026-06-14</a></li><li><a href="#stage-35-session-orchestration---2026-06-13-to-2026-06-14" class="table-of-contents__link toc-highlight">Stage 3.5 session orchestration - 2026-06-13 to 2026-06-14</a></li><li><a href="#stage-3-camera-hardware-foundations---2026-06-12-to-2026-06-13" class="table-of-contents__link toc-highlight">Stage 3 camera hardware foundations - 2026-06-12 to 2026-06-13</a></li><li><a href="#stage-25-persistence-and-admin-control-plane---2026-06-12" class="table-of-contents__link toc-highlight">Stage 2.5 persistence and admin control plane - 2026-06-12</a></li><li><a href="#planning-architecture-and-design-foundation---2026-06-10-to-2026-06-12" class="table-of-contents__link toc-highlight">Planning, architecture, and design foundation - 2026-06-10 to 2026-06-12</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
 </body>
 </html>

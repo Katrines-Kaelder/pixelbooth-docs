@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Pixelbooth Source Docs Index | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Pixelbooth Source Docs Index | Pixelbooth Docs"><meta data-rh="true" name="description" content="This folder is the current source of truth for Pixelbooth architecture, product"><meta data-rh="true" property="og:description" content="This folder is the current source of truth for Pixelbooth architecture, product"><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Pixelbooth Source Docs Index","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.5a14e451.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.c23f4538.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -56,14 +56,22 @@ decisions, staged implementation scope, and agent-readable planning context.</p>
 <li class="">The frontend is one application: booth, gallery, admin, setup, and future standalone displays share the same React app and API/event model.</li>
 <li class="">Admin is the appliance control plane, with dashboard, settings, assets, overlays, remotes, Commander, logs, and setup routes.</li>
 <li class="">Admin-set settings are persisted through typed models and SQLite, with JSON import/export for templates, profiles, overlays, marquee definitions, and backups.</li>
+<li class="">Stage 3 camera work is beyond the adapter-only spike: dual Camera Module 3
+discovery/capture, low-latency CSI preview, native still capture,
+autofocus, image flip, and camera-side exposure metadata have been verified on
+the target Pi. USB/V4L2 selection, GIF preview recovery, and lighting-coupled
+exposure remain tracked as known issues/future work.</li>
 <li class="">Stage 4 media foundations are active: captured media is cataloged in SQLite,
 bytes live in the file store, render work runs through the shared job queue,
 generated OpenAPI types feed the frontend, and the booth/gallery can show real
-still, collage, GIF/boomerang, and video outputs off-hardware.</li>
+still, collage, GIF/boomerang, and video outputs. Current work is now focused
+on Pi-observed media quality, progress, gallery, and performance gaps.</li>
 <li class="">Stage 8 share/sync/QR has moved ahead of the later hardware stages: sync jobs
-reuse the shared queue, rclone backs S3/MinIO, WebDAV, FTP, SFTP, and Google
-Drive remotes, and kiosk/gallery QR panels become scannable only after the
-designated share remote verifies the upload.</li>
+reuse the shared queue; remotes cover local folder, USB, rclone
+S3/MinIO/WebDAV/FTP/SFTP/Google Drive, Immich native upload, and rsync/SSH;
+kiosk/gallery QR panels become scannable only after the designated share
+remote verifies the upload; and the static sharepage can be deployed from
+admin. Print remains the major unbuilt part of Stage 8.</li>
 <li class="">The primary kiosk display is <code>1280x800</code>. Guest capture screens must not scroll; only the gallery may scroll.</li>
 <li class="">Heavy render work must be queued and parallelized so capture feedback is immediate.</li>
 </ul>

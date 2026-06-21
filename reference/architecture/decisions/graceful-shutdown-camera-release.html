@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-architecture/decisions/graceful-shutdown-camera-release" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">ADR-0023: Graceful shutdown that releases camera handles on the first interrupt | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/decisions/graceful-shutdown-camera-release"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="ADR-0023: Graceful shutdown that releases camera handles on the first interrupt | Pixelbooth Docs"><meta data-rh="true" name="description" content="- Status: Accepted"><meta data-rh="true" property="og:description" content="- Status: Accepted"><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/decisions/graceful-shutdown-camera-release"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/decisions/graceful-shutdown-camera-release" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/decisions/graceful-shutdown-camera-release" hreflang="x-default"><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_SfMd" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/pixelbooth-docs/"><div class="navbar__logo"><img src="/pixelbooth-docs/img/logo.svg" alt="Pixelbooth" class="themedComponent_APyr themedComponent--light_EO7i"><img src="/pixelbooth-docs/img/logo.svg" alt="Pixelbooth" class="themedComponent_APyr themedComponent--dark_pCh9"></div><b class="navbar__title text--truncate">Pixelbooth</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/pixelbooth-docs/">Start</a><a class="navbar__item navbar__link" href="/pixelbooth-docs/roadmap">Roadmap</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/pixelbooth-docs/reference">Reference</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/Katrines-Kaelder/pixelbooth" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_zVqi"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_d0wt colorModeToggle_UA7r"><button class="clean-btn toggleButton_QTuX toggleButtonDisabled_VJ6V" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd lightToggleIcon_qTfc"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd darkToggleIcon_chyJ"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd systemToggleIcon_zMbt"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_mV6h"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_VHsW"><div class="docsWrapper_RrKg"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_yQBR" type="button"></button><div class="docRoot_hbZ6"><main class="docMainContainer_qe5w docMainContainerEnhanced_T44m"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_xk77"><div class="docItemContainer_l7WK"><article><div class="tocCollapsible_YFIb theme-doc-toc-mobile tocMobile_RDqH"><button type="button" class="clean-btn tocCollapsibleButton_yU99">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>ADR-0023: Graceful shutdown that releases camera handles on the first interrupt</h1></header>
+<ul>
+<li class=""><strong>Status</strong>: Accepted</li>
+<li class=""><strong>Date</strong>: 2026-06-21</li>
+<li class=""><strong>Related</strong>: <a class="" href="/pixelbooth-docs/reference/architecture/decisions/usb-v4l2-camera-adapter-brought-forward">ADR-0008</a>, <a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-csi-adapter-bare-metal">ADR-0009</a>, <a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-native-stills-dual-stream">ADR-0022</a></li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="context">Context<a href="#context" class="hash-link" aria-label="Direct link to Context" title="Direct link to Context" translate="no">​</a></h2>
+<p>The booth keeps <strong>two</strong> endless responses open: the live preview MJPEG response
+(<code>GET /cameras/{id}/stream.mjpg</code>, whose adapter <code>stream_frames</code> loop runs <code>while True</code>)
+and the <code>/events</code> WebSocket fan-out (blocked on <code>queue.get()</code> forever). The API was
+launched on the Pi with a bare <code>python -m uvicorn pixelbooth.main:app</code>.</p>
+<p>Hardware validation (KI-012) found that stopping the app did not reliably shut
+everything down. uvicorn&#x27;s default graceful shutdown waits for in-flight responses
+to finish, but the open endless responses never end, so the <strong>first</strong> Ctrl+C hung. A
+forced <strong>second</strong> Ctrl+C exited uvicorn without running the FastAPI lifespan, so the
+lifespan <code>finally</code> that calls <code>CameraService.close()</code> never ran. The Picamera2/V4L2
+handle was leaked and the device stayed locked — the app could not restart without
+rebooting the Pi (<code>Pipeline handler in use by another process</code>,
+<code>Camera __init__ sequence did not complete</code>). This is the documented uvicorn
+behaviour in <a href="https://github.com/encode/uvicorn/issues/1579" target="_blank" rel="noopener noreferrer" class="">encode/uvicorn#1579</a>;
+the project&#x27;s reference photobooth hit the same wall and worked around it with
+<code>server.force_exit = True</code>.</p>
+<blockquote>
+<p><strong>Revised after on-Pi validation (2026-06-21).</strong> This ADR first tried to keep
+uvicorn&#x27;s graceful drain and end the streams <em>cooperatively</em> (a one-way
+<code>threading.Event</code> per endless response, polled by each loop, signalled from
+<code>handle_exit</code>, with a bounded <code>timeout_graceful_shutdown</code> backstop). On hardware that
+proved fragile and made shutdown worse: a second endless response (<code>/events</code>) was
+easy to miss, a preview blocked inside a driver <code>capture_file</code> call cannot check the
+flag until it returns (so the bounded timeout still fired and force-cancelled tasks
+with noisy tracebacks), and — fatally — even after the lifespan released the cameras
+the process <em>hung after</em> <code>Application shutdown complete</code> and never exited. The
+decision below replaces the cooperative mechanism with the reference photobooth&#x27;s
+approach, which is simpler and proven on the same hardware class.</p>
+</blockquote>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="decision">Decision<a href="#decision" class="hash-link" aria-label="Direct link to Decision" title="Direct link to Decision" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="a-dedicated-process-entrypoint-owns-shutdown">A dedicated process entrypoint owns shutdown<a href="#a-dedicated-process-entrypoint-owns-shutdown" class="hash-link" aria-label="Direct link to A dedicated process entrypoint owns shutdown" title="Direct link to A dedicated process entrypoint owns shutdown" translate="no">​</a></h3>
+<p>Run the API as <code>python -m pixelbooth</code> (a new <code>pixelbooth/__main__.py</code>) instead of the
+bare uvicorn CLI. It builds the app and a <code>uvicorn.Server</code> subclass, sets
+<code>server.force_exit = True</code>, and runs it. The bind address comes from new
+<code>PIXELBOOTH_HOST</code> / <code>PIXELBOOTH_PORT</code> bootstrap settings.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="force_exit-abandons-the-endless-responses-on-the-first-signal"><code>force_exit</code> abandons the endless responses on the first signal<a href="#force_exit-abandons-the-endless-responses-on-the-first-signal" class="hash-link" aria-label="Direct link to force_exit-abandons-the-endless-responses-on-the-first-signal" title="Direct link to force_exit-abandons-the-endless-responses-on-the-first-signal" translate="no">​</a></h3>
+<p><code>server.force_exit = True</code> (the reference photobooth&#x27;s documented workaround for
+uvicorn #1579) makes uvicorn <strong>abandon</strong> in-flight connections on the first signal
+instead of waiting for them: its shutdown skips the &quot;wait for connections / background
+tasks&quot; loops entirely. So the open preview stream and <code>/events</code> socket no longer block
+the first Ctrl+C, and no <code>timeout_graceful_shutdown</code> wait or task force-cancellation
+happens. We deliberately do <em>not</em> try to end the streams cooperatively — abandoning
+them is what makes shutdown robust regardless of where a stream is blocked.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="cameras-are-released-synchronously-in-the-signal-handler">Cameras are released synchronously in the signal handler<a href="#cameras-are-released-synchronously-in-the-signal-handler" class="hash-link" aria-label="Direct link to Cameras are released synchronously in the signal handler" title="Direct link to Cameras are released synchronously in the signal handler" translate="no">​</a></h3>
+<p>In uvicorn 0.49, <code>force_exit = True</code> also <strong>skips the FastAPI lifespan shutdown</strong>
+(<code>if not self.force_exit: await self.lifespan.shutdown()</code>), so the lifespan <code>finally</code>
+that releases the cameras no longer runs. The <code>uvicorn.Server</code> subclass therefore
+overrides <code>handle_exit</code> to call <code>CameraService.close()</code> <strong>synchronously</strong>, right there
+in the signal handler, before delegating to <code>super().handle_exit()</code> — mirroring how the
+reference app releases resources from its own signal handler. <code>close()</code> is idempotent,
+never raises, and stops the preview loops before releasing the device handles.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="a-hard-process-exit-so-the-process-actually-dies">A hard process-exit so the process actually dies<a href="#a-hard-process-exit-so-the-process-actually-dies" class="hash-link" aria-label="Direct link to A hard process-exit so the process actually dies" title="Direct link to A hard process-exit so the process actually dies" translate="no">​</a></h3>
+<p>Releasing the camera handles is necessary but not sufficient: on the Pi a
+libcamera/V4L2 worker thread can outlive <code>Picamera2.close()</code>, and because it is
+non-daemon, the interpreter&#x27;s own shutdown joins it <strong>forever</strong> — so the process prints
+its last log line and then hangs, never freeing the camera fds, so the restart this ADR
+is about still fails. (The reference app sidesteps this because its camera worker thread
+is <code>daemon=True</code>; our single-process design runs Picamera2 in-process.) After the
+server&#x27;s <code>run()</code> returns, <code>main()</code> flushes logging and calls <code>os._exit(0)</code>. The cameras
+were already released in <code>handle_exit</code>, so this only skips joining a stuck C-extension
+thread.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="consequences">Consequences<a href="#consequences" class="hash-link" aria-label="Direct link to Consequences" title="Direct link to Consequences" translate="no">​</a></h2>
+<ul>
+<li class="">A single Ctrl+C / <code>SIGTERM</code> stops the app, releases the cameras, and the process
+actually exits — so the app restarts without rebooting the Pi, the change that makes
+on-hardware iteration practical (KI-012).</li>
+<li class=""><code>force_exit</code> abandons in-flight connections at signal time (clients of the preview /
+event stream simply reconnect on the next launch), which is acceptable for a kiosk
+appliance and far more robust than chasing every endless response cooperatively.</li>
+<li class=""><code>force_exit</code> skips the lifespan <code>finally</code>, so cleanup other than the camera release
+(DB close, job-queue stop) does not run on shutdown. This is safe: SQLite is
+crash-consistent (WAL) and the job outbox is durable, both recover on next start. The
+camera release — the only cleanup that affects restart — is done explicitly in
+<code>handle_exit</code>.</li>
+<li class="">The docker-compose dev path keeps <code>uvicorn --reload</code> (fake hardware holds no device
+lock), so backend hot-reload is unaffected.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="alternatives-considered">Alternatives considered<a href="#alternatives-considered" class="hash-link" aria-label="Direct link to Alternatives considered" title="Direct link to Alternatives considered" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Cooperative stream stop + bounded <code>timeout_graceful_shutdown</code> (first version of this
+ADR).</strong> Keeps shutdown &quot;graceful&quot; and the lifespan intact, but proved fragile on
+hardware: it must track every endless response, a stream blocked in a driver call
+can&#x27;t honour the stop flag in time, and it still left the process hanging on the
+non-daemon libcamera thread. Replaced by <code>force_exit</code> + <code>os._exit</code>.</li>
+<li class=""><strong><code>os._exit(0)</code> alone, no <code>force_exit</code>.</strong> Would defeat the post-shutdown hang but not
+the <em>first-signal</em> hang: without <code>force_exit</code> uvicorn still waits on the open endless
+responses before <code>run()</code> ever returns, so <code>os._exit</code> is never reached on the first
+Ctrl+C.</li>
+<li class=""><strong>Make the camera worker daemon and rely on the lifespan (reference-app shape).</strong> Our
+adapter has no long-lived worker thread of its own to mark daemon; the blocking thread
+is inside libcamera/Picamera2, which we do not control. Releasing in <code>handle_exit</code> and
+hard-exiting is the equivalent that works for an in-process camera.</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/architecture/decisions/0023-graceful-shutdown-camera-release.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#context" class="table-of-contents__link toc-highlight">Context</a></li><li><a href="#decision" class="table-of-contents__link toc-highlight">Decision</a><ul><li><a href="#a-dedicated-process-entrypoint-owns-shutdown" class="table-of-contents__link toc-highlight">A dedicated process entrypoint owns shutdown</a></li><li><a href="#force_exit-abandons-the-endless-responses-on-the-first-signal" class="table-of-contents__link toc-highlight"><code>force_exit</code> abandons the endless responses on the first signal</a></li><li><a href="#cameras-are-released-synchronously-in-the-signal-handler" class="table-of-contents__link toc-highlight">Cameras are released synchronously in the signal handler</a></li><li><a href="#a-hard-process-exit-so-the-process-actually-dies" class="table-of-contents__link toc-highlight">A hard process-exit so the process actually dies</a></li></ul></li><li><a href="#consequences" class="table-of-contents__link toc-highlight">Consequences</a></li><li><a href="#alternatives-considered" class="table-of-contents__link toc-highlight">Alternatives considered</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+</body>
+</html>

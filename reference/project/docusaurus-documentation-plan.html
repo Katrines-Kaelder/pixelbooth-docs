@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Docusaurus Documentation Plan | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/project/docusaurus-documentation-plan"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Docusaurus Documentation Plan | Pixelbooth Docs"><meta data-rh="true" name="description" content="This document is the implementation handoff for the Pixelbooth Docusaurus site."><meta data-rh="true" property="og:description" content="This document is the implementation handoff for the Pixelbooth Docusaurus site."><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/project/docusaurus-documentation-plan"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/project/docusaurus-documentation-plan" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/project/docusaurus-documentation-plan" hreflang="x-default"><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.5a14e451.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.c23f4538.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -52,43 +52,41 @@ prove otherwise.</li>
 time, following the <code>current-package-versions</code> rule.</li>
 <li class="">Do not scaffold Docusaurus as part of this documentation-only change.</li>
 </ul>
-<h2 class="anchor anchorTargetStickyNavbar_OywG" id="site-shape">Site Shape<a href="#site-shape" class="hash-link" aria-label="Direct link to Site Shape" title="Direct link to Site Shape" translate="no">​</a></h2>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="current-site-shape">Current Site Shape<a href="#current-site-shape" class="hash-link" aria-label="Direct link to Current Site Shape" title="Direct link to Current Site Shape" translate="no">​</a></h2>
 <p>The <code>apps/docs</code> package is a TypeScript Docusaurus site in the existing pnpm
 workspace. It provides local and production docs commands without changing the
-runtime app APIs.</p>
-<p>Root scripts to add later:</p>
+runtime app APIs, and it publishes a curated public layer plus selected
+reference docs copied from <code>.docs</code>.</p>
+<p>Root scripts:</p>
 <ul>
 <li class=""><code>docs:start</code>: run local Docusaurus development server.</li>
 <li class=""><code>docs:build</code>: build the static documentation site.</li>
 <li class=""><code>docs:serve</code>: serve the production build locally.</li>
 <li class=""><code>docs:clear</code>: clear Docusaurus caches when sidebar/routes get stale.</li>
+<li class=""><code>docs:typecheck</code>: typecheck the Docusaurus package.</li>
 </ul>
-<p>Recommended sidebar sections:</p>
+<p>Current navigation and routes:</p>
 <ul>
 <li class=""><code>/</code>: curated project overview and builder/operator entry points.</li>
 <li class=""><code>/roadmap</code>: curated visual status page sourced from
 <code>.docs/status/project-status.json</code>.</li>
-<li class=""><code>/reference/*</code>: selected canonical <code>.docs</code> source material.</li>
-<li class=""><code>Reference/Product</code>: workflows, design direction, moodboard, touchscreen brief.</li>
-<li class=""><code>Reference/Architecture</code>: system architecture, runtime decisions, admin control plane,
-camera/lighting, expanded capabilities, frontend standards, overlay schema.</li>
-<li class=""><code>Reference/API And Integrations</code>: REST contract, WebSocket events, and later generated
-OpenAPI/type links once the API contract stabilizes.</li>
-<li class=""><code>Reference/Roadmap</code>: staged roadmap and task pages for Stage 2 through Stage 10.</li>
-<li class=""><code>Reference/Operations</code>: setup, Pi bring-up, degraded modes, diagnostics, backups,
-opening-night checks, and future rental/operator runbooks.</li>
-<li class=""><code>Reference/ADRs</code>: architecture decision record index and accepted decisions.</li>
+<li class=""><code>/reference/*</code>: selected canonical <code>.docs</code> source material copied by the
+explicit allowlist in <code>apps/docs/scripts/sync-docs.mjs</code>.</li>
+<li class=""><code>/reference/changelog</code>: generated from the root <code>CHANGELOG.md</code>.</li>
 </ul>
-<p>Project-process docs may be copied for link integrity, but they should not be
-promoted into the main sidebar unless the site grows a maintainer-facing section.</p>
+<p>Reference sections include product docs, architecture docs, API/integration
+contracts, roadmap/task docs, operations/getting-started docs, and ADRs. Project
+process docs may be copied for link integrity, but they should not be promoted
+as the main path for operators.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="asset-and-link-migration-notes">Asset And Link Migration Notes<a href="#asset-and-link-migration-notes" class="hash-link" aria-label="Direct link to Asset And Link Migration Notes" title="Direct link to Asset And Link Migration Notes" translate="no">​</a></h2>
-<p>Docusaurus will be less forgiving than plain Markdown in a file browser. The
-implementation should include a cleanup pass before treating the site as done.</p>
+<p>Docusaurus is less forgiving than plain Markdown in a file browser. Docs
+maintenance should include a link/image cleanup pass before treating site
+changes as done.</p>
 <ul>
 <li class="">Keep existing relative Markdown links where they resolve cleanly inside the
 published reference allowlist.</li>
 <li class="">Fix links that point outside <code>.docs/</code> so the published site has stable routes
-or explicit repository links.</li>
+or explicit repository links during normal docs maintenance.</li>
 <li class="">Images that were under <code>.docs/design ideas/</code> now live in
 <code>.docs/assets/design-ideas/</code>.</li>
 <li class="">Image files use lowercase kebab-case names to avoid fragile URL encoding and
@@ -127,9 +125,10 @@ field troubleshooting, and support handoff.</li>
 <p>When a stage changes system behavior, service boundaries, public APIs/events, or
 hardware contracts, update the owning architecture doc before or alongside the
 implementation. Significant hard-to-reverse decisions still need an ADR.</p>
-<h2 class="anchor anchorTargetStickyNavbar_OywG" id="ci-and-deployment-plan">CI And Deployment Plan<a href="#ci-and-deployment-plan" class="hash-link" aria-label="Direct link to CI And Deployment Plan" title="Direct link to CI And Deployment Plan" translate="no">​</a></h2>
-<p>The later Docusaurus implementation should add a docs workflow after the local
-build is stable.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="ci-and-deployment">CI And Deployment<a href="#ci-and-deployment" class="hash-link" aria-label="Direct link to CI And Deployment" title="Direct link to CI And Deployment" translate="no">​</a></h2>
+<p>The docs workflow builds the Docusaurus site on pull requests and publishes the
+generated static output from the <code>docs</code> branch to the public
+<code>Katrines-Kaelder/pixelbooth-docs</code> repository for GitHub Pages.</p>
 <ul>
 <li class="">On pull requests, build the docs but do not publish.</li>
 <li class="">On pushes to the <code>docs</code> branch, build the docs and publish automatically.</li>
@@ -148,8 +147,8 @@ issues in GitHub Actions.</li>
 <li class="">Use workflow concurrency so overlapping publish runs do not race the published
 output.</li>
 </ul>
-<h2 class="anchor anchorTargetStickyNavbar_OywG" id="later-implementation-acceptance-checks">Later Implementation Acceptance Checks<a href="#later-implementation-acceptance-checks" class="hash-link" aria-label="Direct link to Later Implementation Acceptance Checks" title="Direct link to Later Implementation Acceptance Checks" translate="no">​</a></h2>
-<p>The Docusaurus implementation is done when:</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="acceptance-checks">Acceptance Checks<a href="#acceptance-checks" class="hash-link" aria-label="Direct link to Acceptance Checks" title="Direct link to Acceptance Checks" translate="no">​</a></h2>
+<p>The Docusaurus site is healthy when:</p>
 <ul>
 <li class=""><code>pnpm docs:start</code> serves the docs locally.</li>
 <li class=""><code>pnpm docs:build</code> passes without broken links, missing images, or MDX errors.</li>
@@ -166,14 +165,11 @@ JSX/HTML.</li>
 <code>https://katrines-kaelder.github.io/pixelbooth-docs/</code>.</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="scope-boundaries">Scope Boundaries<a href="#scope-boundaries" class="hash-link" aria-label="Direct link to Scope Boundaries" title="Direct link to Scope Boundaries" translate="no">​</a></h2>
-<p>This plan does not implement Docusaurus. It deliberately avoids:</p>
-<ul>
-<li class="">Creating <code>apps/docs</code>.</li>
-<li class="">Installing Docusaurus packages.</li>
-<li class="">Editing <code>pnpm-workspace.yaml</code> or package scripts.</li>
-<li class="">Adding GitHub Actions workflows.</li>
-<li class="">Moving images or rewriting existing links.</li>
-</ul>
-<p>Those changes belong to the later Docusaurus setup implementation.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/project/docusaurus-documentation-plan.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#purpose-and-audience" class="table-of-contents__link toc-highlight">Purpose And Audience</a></li><li><a href="#agreed-decisions" class="table-of-contents__link toc-highlight">Agreed Decisions</a></li><li><a href="#site-shape" class="table-of-contents__link toc-highlight">Site Shape</a></li><li><a href="#asset-and-link-migration-notes" class="table-of-contents__link toc-highlight">Asset And Link Migration Notes</a></li><li><a href="#future-stage-documentation-checklist" class="table-of-contents__link toc-highlight">Future-Stage Documentation Checklist</a></li><li><a href="#ci-and-deployment-plan" class="table-of-contents__link toc-highlight">CI And Deployment Plan</a></li><li><a href="#later-implementation-acceptance-checks" class="table-of-contents__link toc-highlight">Later Implementation Acceptance Checks</a></li><li><a href="#scope-boundaries" class="table-of-contents__link toc-highlight">Scope Boundaries</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+<p>Do not put Docusaurus-only JSX, HTML, route metadata churn, or visual status
+components into <code>.docs/roadmap/roadmap.md</code> or other operational source docs.
+Presentation belongs in <code>apps/docs</code>; source/reference facts belong in <code>.docs</code>.
+When the public site needs richer visual treatment, add or update a curated page,
+React component, CSS module/global stylesheet, or structured data file rather
+than making agent-readable Markdown harder to maintain.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/project/docusaurus-documentation-plan.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#purpose-and-audience" class="table-of-contents__link toc-highlight">Purpose And Audience</a></li><li><a href="#agreed-decisions" class="table-of-contents__link toc-highlight">Agreed Decisions</a></li><li><a href="#current-site-shape" class="table-of-contents__link toc-highlight">Current Site Shape</a></li><li><a href="#asset-and-link-migration-notes" class="table-of-contents__link toc-highlight">Asset And Link Migration Notes</a></li><li><a href="#future-stage-documentation-checklist" class="table-of-contents__link toc-highlight">Future-Stage Documentation Checklist</a></li><li><a href="#ci-and-deployment" class="table-of-contents__link toc-highlight">CI And Deployment</a></li><li><a href="#acceptance-checks" class="table-of-contents__link toc-highlight">Acceptance Checks</a></li><li><a href="#scope-boundaries" class="table-of-contents__link toc-highlight">Scope Boundaries</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
 </body>
 </html>

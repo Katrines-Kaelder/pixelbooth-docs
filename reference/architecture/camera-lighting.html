@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Camera And Lighting Architecture | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Camera And Lighting Architecture | Pixelbooth Docs"><meta data-rh="true" name="description" content="Camera Roles"><meta data-rh="true" property="og:description" content="Camera Roles"><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Camera And Lighting Architecture","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.5a14e451.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.c23f4538.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -44,12 +44,29 @@ connected, so all four availability states — <code>both</code>, <code>normal_o
 follow directly from the connected hardware, and this is the first backend that can drive the
 real <code>both</code>/<code>dual</code> preset modes. Enumeration is open-free (it does not grab a streaming
 handle), so status polling never collides with an active preview; each camera has its own lock
-so preview and still capture on the same device serialize. Picamera2 is the <strong>system
-<code>python3-picamera2</code></strong> package (it is not pip-installable), so the API runs on bare-metal Pi OS
-with a <code>--system-site-packages</code> venv; it is lazy-imported, so fake/dev/CI paths never require
-it. JPEG frames come from Picamera2&#x27;s own <code>capture_file(..., format=&quot;jpeg&quot;)</code> pipeline, so a
-CSI-only booth needs no OpenCV. Rationale and trade-offs:
-<a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-csi-adapter-bare-metal">ADR-0009</a>.</p>
+so preview and still capture on the same device serialize. Each camera builds <strong>two
+configurations and idles in the cheap one</strong> (ADR-0024): a light <code>create_video_configuration</code>
+with a <code>main</code> (a full-FoV IMX708 sensor mode, default <code>2304x1296</code>) plus a <code>lores</code> stream for
+live preview, and a <code>create_still_configuration</code> with the native (or runtime-capped) <code>main</code> for
+the full-resolution ORIGINAL. Idling in the video config keeps the sensor in a fast mode, so the
+<code>lores</code> preview is not pinned to the slow native-resolution readout (~14 fps on Camera Module 3).
+The preview <code>main</code> must select a <strong>full-field-of-view</strong> mode (the binned <code>2304x1296</code>, ~56fps),
+not the cropped <code>1536x864</code> high-fps mode, or the preview looks zoomed-in versus the saved still
+(KI-003). These preview knobs + the image flip are runtime, admin-editable <code>camera</code> settings.
+A still takes the role lock, stops the encoder, <code>switch_mode</code>s to the still config, captures
+<code>main</code> at the <strong>native full sensor resolution</strong> (<code>4608x2592</code> by default), switches back, and
+restarts the encoder — so the captured ORIGINAL stays native while idle preview runs fast. The
+capture resolution is an admin-editable <code>capture</code> setting (<code>capture_max_width/height</code>, <code>0</code> =
+native full sensor) read when a camera opens, so it applies on the next open. Live preview is
+served by a continuous hardware <strong><code>MJPEGEncoder</code></strong> on the <code>lores</code> stream writing each JPEG into a
+latest-frame buffer; the stream yields the freshest frame so a slow client never drains a backlog
+(realtime feed, not per-frame <code>capture_file</code>). Stills still use <code>capture_file(name=&quot;main&quot;)</code>.
+Picamera2 is the <strong>system <code>python3-picamera2</code></strong> package (it is not pip-installable), so the API
+runs on bare-metal Pi OS with a <code>--system-site-packages</code> venv; it is lazy-imported, so
+fake/dev/CI paths never require it. A CSI-only booth needs no OpenCV. Rationale and trade-offs:
+<a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-csi-adapter-bare-metal">ADR-0009</a>,
+<a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-native-stills-dual-stream">ADR-0022</a>,
+<a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-preview-capture-mode-split">ADR-0024</a>.</p>
 <p><strong>USB / V4L2 single-device role mapping.</strong> A USB UVC webcam is one physical device, so it
 maps to <strong>one configurable role</strong> (<code>usb_camera_role</code>, default <code>normal</code>) addressing one
 <code>/dev/video*</code> device (<code>usb_camera_device</code>). This reuses the existing degraded-mode path
@@ -64,11 +81,47 @@ never pull in the native wheel. Rationale and trade-offs: <a class="" href="/pix
 shutdown so a restart can reacquire them instead of finding the device locked (a real risk
 on the Pi, where a UVC webcam allows only one open V4L2 handle and CSI cameras hold a
 per-role lock). The <code>CameraAdapter</code> protocol therefore exposes an <strong>idempotent</strong> <code>close()</code>:
-<code>usb</code>/<code>picamera2</code> release their capture handles, the <code>fake</code> adapter is a no-op. The API
-lifespan calls <code>CameraService.close()</code> during shutdown (after the session service stops, so
-no capture is in flight). <code>CameraService.close()</code> never raises — if a device cannot be
-released (e.g. it is still locked), it logs a user-safe diagnostic with a <code>diagnostic_id</code> and
-returns it, so a stuck device is actionable rather than silent.</p>
+<code>usb</code>/<code>picamera2</code> release their capture handles, the <code>fake</code> adapter is a no-op.
+<code>CameraService.close()</code> never raises — if a device cannot be released (e.g. it is still
+locked), it logs a user-safe diagnostic with a <code>diagnostic_id</code> and returns it, so a stuck
+device is actionable rather than silent.</p>
+<p>Reaching that release on the first interrupt needs help, because the booth keeps two endless
+responses open — the live preview MJPEG response and the <code>/events</code> WebSocket fan-out — and
+uvicorn&#x27;s graceful shutdown waits for in-flight responses to finish. So a bare <code>uvicorn</code>
+launch hangs on the first Ctrl+C and only a forced second interrupt exits, skipping the
+lifespan and leaking the locked camera (uvicorn #1579). The Pi therefore runs the API via the
+<code>python -m pixelbooth</code> entrypoint, which (following the reference photobooth&#x27;s proven
+workaround) sets <code>server.force_exit = True</code> so uvicorn <strong>abandons</strong> those endless responses on
+the first signal instead of waiting for them. <code>force_exit</code> also skips the FastAPI lifespan, so
+the entrypoint&#x27;s <code>handle_exit</code> calls <code>CameraService.close()</code> <strong>synchronously</strong> in the signal
+handler, before delegating to uvicorn — releasing the cameras even though the lifespan no
+longer runs.</p>
+<p>One more hazard is specific to the camera: a libcamera/V4L2 worker thread can outlive
+<code>Picamera2.close()</code>, and being non-daemon it blocks the interpreter&#x27;s own shutdown forever —
+so the process prints its last log line and then hangs, never freeing the camera fds and
+defeating the very restart this is about. Once the server returns, the entrypoint therefore
+forces the process to exit (<code>os._exit(0)</code>); the cameras were already released in
+<code>handle_exit</code>, so this only skips joining the stuck thread. See
+<a class="" href="/pixelbooth-docs/reference/architecture/decisions/graceful-shutdown-camera-release">ADR-0023</a>.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="autofocus">Autofocus<a href="#autofocus" class="hash-link" aria-label="Direct link to Autofocus" title="Direct link to Autofocus" translate="no">​</a></h2>
+<p>The CSI Camera Module 3 (IMX708) cameras have a focus motor, so the booth enables autofocus
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/continuous-autofocus-and-sensor-exposure-controls">ADR-0025</a>). Focus is an
+admin-editable <code>camera</code> setting, read live by the Picamera2 adapter and applied after the camera
+starts (and re-applied in place on an admin edit, like the preview tuning):</p>
+<ul>
+<li class=""><strong><code>af_mode</code></strong> — <code>continuous</code> (default), <code>auto</code>, or <code>manual</code>. Continuous tracks the guest as they
+move into frame (zero config). The lens is set to <code>AfSpeed=Fast</code> so it settles quickly.</li>
+<li class=""><strong><code>af_range</code></strong> — <code>normal</code> (default), <code>macro</code>, or <code>full</code>.</li>
+<li class=""><strong><code>lens_position</code></strong> — a fixed focus distance in dioptres (<code>1/metres</code>), used only under
+<code>af_mode = manual</code>. This is the <strong>manual-lock escape hatch</strong>: a busy club is a low-contrast
+scene where continuous AF can <em>hunt</em> (the lens visibly breathes searching for focus, and may be
+mid-hunt at capture), so an operator can pin focus at the booth&#x27;s known standing distance and
+the motor then never moves — no hunting, no focus latency at capture. It is an operator setup
+choice, not an automatic trigger. (An <code>auto</code> + AF-trigger-at-countdown middle mode is a planned
+follow-up.)</li>
+</ul>
+<p>Each control is applied defensively (a camera/role lacking it logs and continues), so a non-AF
+device degrades instead of failing to open.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="camera-availability-and-degraded-mode">Camera Availability And Degraded Mode<a href="#camera-availability-and-degraded-mode" class="hash-link" aria-label="Direct link to Camera Availability And Degraded Mode" title="Direct link to Camera Availability And Degraded Mode" translate="no">​</a></h2>
 <p>The booth should remain usable if one camera is unavailable.</p>
 <ul>
@@ -91,10 +144,12 @@ returns it, so a stuck device is actionable rather than silent.</p>
 <p>Non-Pi development uses fake cameras that generate deterministic placeholder images. This keeps tests and frontend work usable on laptops.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="preview">Preview<a href="#preview" class="hash-link" aria-label="Direct link to Preview" title="Direct link to Preview" translate="no">​</a></h2>
 <p>V1 uses MJPEG streams because they are simple, local-network friendly, and match the appliance deployment model. The preview provider remains abstract so it can later move to WebRTC or libcamera-native streaming if needed.</p>
-<p>Each camera adapter exposes a <code>stream_jpeg(role)</code> frame generator; the API serves it as a
-<code>multipart/x-mixed-replace</code> MJPEG response at <code>GET /cameras/{id}/stream.mjpg</code>. The fake and
-USB adapters serve this identically (placeholder vs. live V4L2 frames). The documented budget
-is ~720p at ~15fps; measured fps, latency, CPU, and bandwidth are recorded on target hardware.</p>
+<p>Each camera adapter exposes a <code>stream_frames(role)</code> generator; the API serves it as a
+<code>multipart/x-mixed-replace</code> MJPEG response at <code>GET /cameras/{id}/stream.mjpg</code>. The fake, USB, and
+CSI adapters serve this identically (placeholder vs. live frames). The CSI adapter produces
+frames from a continuous hardware <code>MJPEGEncoder</code> on a fast-mode <code>lores</code> stream (ADR-0024) rather
+than re-encoding per frame, to keep the local feed realtime. The documented budget is ~720p at
+~30fps; measured fps, latency, CPU, and bandwidth are recorded on target hardware (KI-003).</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="live-preview-camera-selection">Live Preview Camera Selection<a href="#live-preview-camera-selection" class="hash-link" aria-label="Direct link to Live Preview Camera Selection" title="Direct link to Live Preview Camera Selection" translate="no">​</a></h2>
 <p>Guest-facing booth screens must let users switch the live preview camera before pressing the capture button. The common case is a simple <code>normal</code>/<code>wide</code> selector, but the selector must be driven by camera availability and the chosen capture preset.</p>
 <p>Rules:</p>
@@ -123,6 +178,29 @@ is ~720p at ~15fps; measured fps, latency, CPU, and bandwidth are recorded on ta
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="exposure-and-ring-light">Exposure And Ring Light<a href="#exposure-and-ring-light" class="hash-link" aria-label="Direct link to Exposure And Ring Light" title="Direct link to Exposure And Ring Light" translate="no">​</a></h2>
 <p>Exposure control is separate from decorative lighting. The booth must handle both bright room lights and dark club mode with dancefloor lighting.</p>
+<p>This area lands in two parts:</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="sensor-side-camera-exposure-implemented--adr-0025">Sensor-side camera exposure (implemented — ADR-0025)<a href="#sensor-side-camera-exposure-implemented--adr-0025" class="hash-link" aria-label="Direct link to Sensor-side camera exposure (implemented — ADR-0025)" title="Direct link to Sensor-side camera exposure (implemented — ADR-0025)" translate="no">​</a></h3>
+<p>The camera-only slice runs <strong>now</strong>: the sensor&#x27;s own auto-exposure/auto-gain (AEC/AGC) and
+auto-white-balance produce a normal exposure from &quot;what the sensor sees&quot;, with a small set of
+admin-editable <code>camera</code> controls applied live by the Picamera2 adapter
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/continuous-autofocus-and-sensor-exposure-controls">ADR-0025</a>):</p>
+<ul>
+<li class=""><code>ae_enable</code> (auto exposure on by default), <code>ae_metering</code> (<code>centre</code>/<code>spot</code>/<code>matrix</code>),
+<code>ae_exposure_mode</code> (<code>normal</code>/<code>short</code>/<code>long</code> — <code>short</code> favours faster shutter / higher gain to
+reduce motion blur of moving guests), and <code>exposure_value</code> (EV compensation).</li>
+<li class="">an optional manual <code>exposure_time_us</code> + <code>analogue_gain</code> pair, used only when <code>ae_enable</code> is off.</li>
+<li class=""><code>awb_enable</code> (on by default) and <code>awb_mode</code> (<code>auto</code>/<code>tungsten</code>/<code>fluorescent</code>/<code>indoor</code>/
+<code>daylight</code>/<code>cloudy</code>).</li>
+</ul>
+<p>Focus/exposure <strong>metadata</strong> (lens position, focus figure-of-merit, exposure time, analogue/digital
+gain, lux, colour temperature) is read from camera metadata and surfaced on the admin dashboard
+next to the measured preview fps, so an operator can verify AE/AF behaviour while tuning on
+hardware.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="coordinated-exposureservice-deferred--ki-006-stage-5">Coordinated ExposureService (deferred — KI-006, Stage 5)<a href="#coordinated-exposureservice-deferred--ki-006-stage-5" class="hash-link" aria-label="Direct link to Coordinated ExposureService (deferred — KI-006, Stage 5)" title="Direct link to Coordinated ExposureService (deferred — KI-006, Stage 5)" translate="no">​</a></h3>
+<p>The full picture below — coordinating the camera controls <strong>with</strong> the ring light, ambient/colour
+sensors, and per-event lighting profiles — is the deferred <code>ExposureService</code> hardware spike
+(KI-006). It needs the real lights and sensors to design against; the sensor-side controls above
+are the forward-compatible inputs it will later coordinate.</p>
 <p>The planned ring light uses high-CRI dual-white LED strips with warm and cold channels, likely covering about 2700K to 6500K. The app should control both total brightness and warm/cold mix.</p>
 <p><code>ExposureService</code> should coordinate:</p>
 <ul>
@@ -167,6 +245,6 @@ is ~720p at ~15fps; measured fps, latency, CPU, and bandwidth are recorded on ta
 <li class=""><code>hard-2x2</code></li>
 <li class=""><code>soft-2x2</code></li>
 </ul>
-<p>The main app owns design storage, admin preview, trigger mapping, and push/status. The Pi Zero agent owns HUB75 output, local timing, panel refresh, brightness enforcement, and later GIF/video playback.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/architecture/camera-lighting.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/pixelbooth-docs/reference/architecture/admin-control-plane"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Admin Control Plane</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/pixelbooth-docs/reference/architecture/expanded-capabilities"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Expanded Capabilities Architecture</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#camera-roles" class="table-of-contents__link toc-highlight">Camera Roles</a></li><li><a href="#camera-backends-and-usb--v4l2-cameras" class="table-of-contents__link toc-highlight">Camera Backends And USB / V4L2 Cameras</a></li><li><a href="#camera-availability-and-degraded-mode" class="table-of-contents__link toc-highlight">Camera Availability And Degraded Mode</a></li><li><a href="#development-cameras" class="table-of-contents__link toc-highlight">Development Cameras</a></li><li><a href="#preview" class="table-of-contents__link toc-highlight">Preview</a></li><li><a href="#live-preview-camera-selection" class="table-of-contents__link toc-highlight">Live Preview Camera Selection</a></li><li><a href="#lighting-events" class="table-of-contents__link toc-highlight">Lighting Events</a></li><li><a href="#exposure-and-ring-light" class="table-of-contents__link toc-highlight">Exposure And Ring Light</a></li><li><a href="#wled-adapter" class="table-of-contents__link toc-highlight">WLED Adapter</a></li><li><a href="#custom-esp32-adapter" class="table-of-contents__link toc-highlight">Custom ESP32 Adapter</a></li><li><a href="#marquee-display" class="table-of-contents__link toc-highlight">Marquee Display</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+<p>The main app owns design storage, admin preview, trigger mapping, and push/status. The Pi Zero agent owns HUB75 output, local timing, panel refresh, brightness enforcement, and later GIF/video playback.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/architecture/camera-lighting.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/pixelbooth-docs/reference/architecture/admin-control-plane"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Admin Control Plane</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/pixelbooth-docs/reference/architecture/expanded-capabilities"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Expanded Capabilities Architecture</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#camera-roles" class="table-of-contents__link toc-highlight">Camera Roles</a></li><li><a href="#camera-backends-and-usb--v4l2-cameras" class="table-of-contents__link toc-highlight">Camera Backends And USB / V4L2 Cameras</a></li><li><a href="#autofocus" class="table-of-contents__link toc-highlight">Autofocus</a></li><li><a href="#camera-availability-and-degraded-mode" class="table-of-contents__link toc-highlight">Camera Availability And Degraded Mode</a></li><li><a href="#development-cameras" class="table-of-contents__link toc-highlight">Development Cameras</a></li><li><a href="#preview" class="table-of-contents__link toc-highlight">Preview</a></li><li><a href="#live-preview-camera-selection" class="table-of-contents__link toc-highlight">Live Preview Camera Selection</a></li><li><a href="#lighting-events" class="table-of-contents__link toc-highlight">Lighting Events</a></li><li><a href="#exposure-and-ring-light" class="table-of-contents__link toc-highlight">Exposure And Ring Light</a><ul><li><a href="#sensor-side-camera-exposure-implemented--adr-0025" class="table-of-contents__link toc-highlight">Sensor-side camera exposure (implemented — ADR-0025)</a></li><li><a href="#coordinated-exposureservice-deferred--ki-006-stage-5" class="table-of-contents__link toc-highlight">Coordinated ExposureService (deferred — KI-006, Stage 5)</a></li></ul></li><li><a href="#wled-adapter" class="table-of-contents__link toc-highlight">WLED Adapter</a></li><li><a href="#custom-esp32-adapter" class="table-of-contents__link toc-highlight">Custom ESP32 Adapter</a></li><li><a href="#marquee-display" class="table-of-contents__link toc-highlight">Marquee Display</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
 </body>
 </html>

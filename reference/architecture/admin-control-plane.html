@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Admin Control Plane | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Admin Control Plane | Pixelbooth Docs"><meta data-rh="true" name="description" content="Pixelbooth has one frontend application. The guest booth, gallery, admin, setup, and future companion display views live in the same React app and share one API/event model. Admin is not a separate product or an afterthought; it is the operator control plane for the appliance."><meta data-rh="true" property="og:description" content="Pixelbooth has one frontend application. The guest booth, gallery, admin, setup, and future companion display views live in the same React app and share one API/event model. Admin is not a separate product or an afterthought; it is the operator control plane for the appliance."><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Admin Control Plane","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.5a14e451.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.c23f4538.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -15,19 +15,63 @@
 <p>Pixelbooth has one frontend application. The guest booth, gallery, admin, setup, and future companion display views live in the same React app and share one API/event model. Admin is not a separate product or an afterthought; it is the operator control plane for the appliance.</p>
 <p>The reference photobooth frontend is useful because it shows a mature single-app shape: a kiosk route, gallery routes, standalone display routes, an authenticated admin layout, a real dashboard as the admin landing page, file upload/browser tools, schema-driven config, logs, first-start setup, multicam tools, and system commands behind confirmations. Pixelbooth should keep those concepts, improve the UX, and avoid copying the implementation directly.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="admin-information-architecture">Admin Information Architecture<a href="#admin-information-architecture" class="hash-link" aria-label="Direct link to Admin Information Architecture" title="Direct link to Admin Information Architecture" translate="no">​</a></h2>
-<p>Initial admin routes should be organized around operator jobs:</p>
+<p>Admin is a <strong>desktop-first control plane</strong>: operators reach it from a computer, not
+the kiosk touchscreen, so the layout uses a two-level navigation that fills the
+horizontal space instead of a single narrow sidebar.</p>
 <ul>
-<li class=""><code>/admin</code>: dashboard with opening-night readiness, system health, recent activity, storage, temperature, camera/lighting/sync/print status, and safe quick actions.</li>
-<li class=""><code>/admin/settings</code>: typed settings editor grouped by booth, capture presets, cameras, exposure, lighting, overlays, sharing, remotes, printer, network, and advanced system settings.</li>
-<li class=""><code>/admin/assets</code>: file browser and upload surface for user-managed assets such as overlays, backgrounds, fonts, logos, QR branding, marquee assets, and imported/exported setting templates.</li>
-<li class=""><code>/admin/overlays</code>: overlay library, PNG overlay preview, and future overlay designer.</li>
-<li class=""><code>/admin/media</code>: operator gallery with hide/delete/download/recycle controls.</li>
-<li class=""><code>/admin/remotes</code>: upload/sync remotes, queue status, test actions, and per-remote credentials/settings.</li>
-<li class=""><code>/admin/commander</code>: allowlisted system tasks, service tasks, diagnostics tasks, and hardware test commands with confirmation and live output.</li>
-<li class=""><code>/admin/logs</code>: structured logs, filters, diagnostic ids, and downloadable bundles.</li>
-<li class=""><code>/admin/setup</code>: guided first-run/rental setup flow.</li>
+<li class=""><strong>Top navigation</strong> holds the operator-job <em>categories</em>. It is always present.</li>
+<li class="">Selecting a category reveals a <strong>left sidebar</strong> of that category&#x27;s sub-sections.</li>
+<li class="">The <strong>Dashboard</strong> is the landing view and a special case: it has no sidebar and
+renders full-width.</li>
 </ul>
-<p>The first implementation can combine some routes into tabs or panels, but the conceptual model should stay stable so later work has a place to land.</p>
+<p>The categories group the underlying operator jobs (each sub-section maps to a panel
+or a typed settings section; sections marked <em>(later)</em> are reserved slots for
+roadmap work so it has a place to land):</p>
+<ul>
+<li class=""><strong>Dashboard</strong> (<code>/admin</code>): opening-night readiness, system health, recent activity,
+storage, temperature, camera/lighting/sync/print status, and safe quick actions.
+Full-width, no sidebar.</li>
+<li class=""><strong>Capture</strong> (<code>/admin/capture/*</code>): <code>cameras</code> <em>(later)</em>, <code>modes</code> (capture settings:
+countdown, retake, default preset, and the per-format render output sizes), and
+<code>overlays</code> (overlay library + PNG preview + future designer). Exposure and lighting
+<em>(later)</em> land here too.</li>
+<li class=""><strong>Experience</strong> (<code>/admin/experience/*</code>): <code>booth</code> (attract text, idle timeout,
+language, <code>show_pics_taken</code> — the attract SNAPS counter, <code>crt_scanlines</code> —
+the guest-screen CRT scanline overlay strength: <code>off</code>/<code>subtle</code>/<code>full</code>, a first
+slice of FR-004, see KI-011, and <code>auto_return_enabled</code>/<code>auto_return_seconds</code> —
+the inactivity auto-return from abandoned result/mode-select/error screens back
+to attract, see KI-027) and <code>event</code> (active
+event/profile name, slug, and gallery presentation: <code>gallery_enabled</code>,
+<code>gallery_page_size</code>, <code>gallery_newest_first</code>, all read by the guest gallery).
+Theme/branding and marquee <em>(later)</em>.</li>
+<li class=""><strong>Sharing</strong> (<code>/admin/sharing/*</code>): <code>sharing</code> (designate the share remote, link mode,
+and live link preview) and <code>remotes</code> (upload/sync remotes, queue status, test
+actions, per-remote credentials/settings). Print <em>(later)</em>.</li>
+<li class=""><strong>Library</strong> (<code>/admin/library/*</code>): <code>assets</code> (file browser + upload for overlays,
+backgrounds, fonts, branding, marquee assets, and imported/exported templates) and
+<code>media</code> <em>(later — operator gallery with hide/delete/download/recycle)</em>.</li>
+<li class=""><strong>System</strong> (<code>/admin/system/*</code>): <code>commander</code> (allowlisted system/service/diagnostics
+and hardware-test tasks with confirmation and live output), <code>logs</code> <em>(later)</em>,
+<code>setup</code> <em>(later — guided first-run/rental flow)</em>, and <code>advanced</code> (system settings:
+retention, <code>timezone</code> (the dashboard clock formats in it), <code>display_hostname</code> (a
+friendly device label shown on the dashboard), <code>log_level</code> (applied to the root
+logger on startup), and the webhook secret).</li>
+</ul>
+<p>The conceptual model is stable so later work has a place to land; sub-sections can be
+added inside a category without reshaping the top navigation.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="theme-and-density">Theme And Density<a href="#theme-and-density" class="hash-link" aria-label="Direct link to Theme And Density" title="Direct link to Theme And Density" translate="no">​</a></h3>
+<p>The admin control plane does <strong>not</strong> inherit the guest arcade aesthetic verbatim. It
+shares the project&#x27;s semantic tokens and stays color-aligned, but optimizes for fast,
+legible operation: it carries its own calmer palette and a <strong>light/dark mode toggle
+(defaulting to dark)</strong>, both expressed through the semantic token layer (no one-off
+colors). The dashboard favors a dense, scannable grid of compact status cards over a
+few oversized panels, so an operator can read readiness at a glance.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="saving-settings">Saving Settings<a href="#saving-settings" class="hash-link" aria-label="Direct link to Saving Settings" title="Direct link to Saving Settings" translate="no">​</a></h3>
+<p>Settings edits accumulate as a <strong>draft</strong> across the settings sub-sections. A single
+prominent <strong>&quot;Save all changes&quot;</strong> action (with an unsaved-changes count and a discard)
+commits every pending section at once; per-section save remains available as a
+secondary, de-emphasized control. Purpose-built editors (sharing, remotes) keep their
+own scoped save.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="dashboard-first">Dashboard First<a href="#dashboard-first" class="hash-link" aria-label="Direct link to Dashboard First" title="Direct link to Dashboard First" translate="no">​</a></h2>
 <p>The admin landing view should answer &quot;can we open the booth now?&quot; without forcing the operator to inspect every panel.</p>
 <p>Dashboard sections:</p>
@@ -51,12 +95,41 @@
 <li class="">Environment variables only for process/runtime bootstrap values such as data directory, environment, bind host/port, and fake-hardware flags.</li>
 </ul>
 <p>This gives the speed and inspectability of JSON where it helps, while avoiding a growing pile of mutable JSON files for transactional app state.</p>
+<p>The <code>capture</code> settings section also carries <strong>per-mode enable flags</strong>
+(<code>mode_photo_enabled</code>, <code>mode_collage_enabled</code>, <code>mode_gif_enabled</code>,
+<code>mode_video_enabled</code>; the GIF flag also governs boomerang, ADR-0013). A disabled
+mode is hidden from the booth ModeSelect and rejected server-side by
+<code>SessionService</code> (<code>409 session.mode_disabled</code>), so an operator can turn a mode off
+for an event without code changes.</p>
+<p>It also carries <strong>per-mode capture tuning</strong>, read live so edits apply to the next
+session without a restart: <code>countdown_seconds</code>, <code>collage_shot_count</code> (posed multi-shot
+count), <code>record_seconds</code> (the gif/boomerang/video record window), and <code>gif_fps</code> /
+<code>video_fps</code> (playback speed; GIF covers boomerang). <code>SessionService</code> reads the timing
+and shot count; the render reads the fps.</p>
 <p>The <code>capture</code> settings section also carries the per-format <strong>render output sizes</strong> —
 <code>still</code>/<code>video</code>/<code>gif</code> max width/height, where <code>0</code> keeps native resolution (ADR-0015/0016).
 These are admin-editable at runtime (ADR-0017): defaults come from the typed <code>CaptureSettings</code>
 model (seeded into SQLite on first run like any setting — not env), and the render reads them
 live, so a change applies to the next capture&#x27;s render without a restart. GIF defaults to a
 720px box because native GIF is very large and slow.</p>
+<p>Distinct from those output sizes, the section carries the <strong>sensor capture resolution</strong> —
+<code>capture_max_width</code>/<code>capture_max_height</code>, where <code>0</code> = native full sensor (ADR-0022). This is
+the size the camera captures the ORIGINAL at, <em>upstream</em> of the per-format output downscale
+above. It defaults to native (full-resolution Camera Module 3 stills) and the Picamera2
+adapter reads it live, so an operator can cap it (e.g. for thermal/storage headroom) from the
+admin UI without a restart.</p>
+<p>The separate <strong><code>camera</code> settings section</strong> owns the server-side <strong>live-preview tuning and image
+orientation</strong> for the Raspberry Pi cameras (ADR-0024): <code>preview_fps</code>, the lores stream size
+(<code>preview_width</code>/<code>preview_height</code>), the preview <code>main</code> size (<code>preview_main_width</code>/<code>_height</code>,
+which picks the fast IMX708 sensor mode), and the image flip — <code>flip_horizontal</code>,
+<code>flip_vertical</code>, and a <code>flip_scope</code> (<code>all</code> flips the saved still too; <code>preview_only</code> mirrors only
+the live preview). Like the capture sizes, these are typed defaults seeded into SQLite and read
+live by the Picamera2 adapter; a successful patch reconfigures any open camera in place, so a
+flip or preview change applies on the next preview reconnect without a restart. The section is
+<strong>admin-only</strong> (excluded from the guest config view) since it is server-side hardware tuning, not
+booth content. The admin Cameras page hosts a purpose-built form for it, and the dashboard shows
+the <strong>measured preview fps</strong> (<code>GET /system/metrics</code>) with inline flip quick-toggles so an operator
+can correct a mirrored/upside-down feed and watch the live frame rate while tuning.</p>
 <p>Settings model:</p>
 <ul>
 <li class=""><code>active_settings</code>: current appliance settings, versioned by schema.</li>
@@ -122,7 +195,16 @@ live, so a change applies to the next capture&#x27;s render without a restart. G
 <li class="">timeout, log handling, and cancellation support where possible</li>
 <li class="">audit record with status, timestamps, output summary, and diagnostic id</li>
 </ul>
-<p>Do not expose free-form shell execution in the admin UI. A future expert mode can be considered, but the appliance default should be safe and predictable.</p>
+<p>The appliance default is <strong>safe and predictable: no free-form shell</strong>. The one
+exception is an <strong>off-by-default expert mode</strong> (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/commander-expert-mode-and-scheduling">ADR-0019</a>):
+when <code>system.expert_mode_enabled</code> is on, Commander exposes a single gated <code>shell_exec</code>
+task that runs an operator-entered host command, bounded by a timeout, with output
+captured and audited like any other run (<code>risk_level=dangerous</code>, confirm required). It is
+not listed and is rejected while expert mode is off. Turning it on makes the operator
+secret guard host command execution — a trade-off the owner explicitly opts into.</p>
+<p>Commander tasks (including the gated <code>shell_exec</code> while expert mode is on) can also be
+<strong>scheduled</strong> to run on an interval; a scheduled run goes through the same allowlist,
+gates, and audit path as a manual one (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/commander-expert-mode-and-scheduling">ADR-0019</a>).</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="remotes-and-synchronizer">Remotes And Synchronizer<a href="#remotes-and-synchronizer" class="hash-link" aria-label="Direct link to Remotes And Synchronizer" title="Direct link to Remotes And Synchronizer" translate="no">​</a></h2>
 <p>Sync is remote-driven. Operators configure one or more remotes, each with common queue behavior and type-specific settings.</p>
 <p>Common remote fields:</p>
@@ -132,6 +214,11 @@ live, so a change applies to the next capture&#x27;s render without a restart. G
 <li class="">enabled</li>
 <li class="">sync policy: originals, final renders, print-ready, mobile/share, metadata, or all</li>
 <li class="">trigger policy: on capture complete, scheduled, manual, on USB insert</li>
+<li class="">frequency: a friendly surface over the trigger — <strong>Instant</strong> (on each capture, the
+default), a timed interval (every 5/15/30 minutes or hourly → <code>scheduled</code> +
+<code>interval_seconds</code>), or <strong>Manual</strong> only. A background sync scheduler (main.py lifespan,
+off the request path, cancelled on shutdown) enqueues a sync for each enabled scheduled
+remote once its interval elapses; uploads then drain on the durable outbox.</li>
 <li class="">concurrency and retry policy</li>
 <li class="">destination path/album/folder semantics</li>
 <li class="">last success/failure and queue depth</li>
@@ -186,6 +273,32 @@ mount/unmount itself stays in a host-side helper (<code>hardware-boundaries</cod
 copies to an already-mounted path and degrades with a user-safe &quot;drive not mounted&quot;
 message when the path is absent. Pairs with the <code>on_usb_insert</code> trigger policy.</li>
 </ul>
+<h4 class="anchor anchorTargetStickyNavbar_OywG" id="adding-and-editing-a-remote-admin-form-write-only-secrets">Adding and editing a remote (admin form, write-only secrets)<a href="#adding-and-editing-a-remote-admin-form-write-only-secrets" class="hash-link" aria-label="Direct link to Adding and editing a remote (admin form, write-only secrets)" title="Direct link to Adding and editing a remote (admin form, write-only secrets)" translate="no">​</a></h4>
+<p>The admin <strong>Remotes</strong> panel renders a <strong>type-aware form</strong> driven by a declarative
+per-type field schema (<code>apps/web/src/features/admin/remotes/remoteFields.ts</code>), so the
+create and edit forms expose exactly the settings each transport&#x27;s adapter validates.
+A single <strong>Destination</strong> picker flattens rclone&#x27;s backends to top-level choices
+(<code>S3 / MinIO</code>, <code>Google Drive</code>, <code>WebDAV / Nextcloud</code>, <code>SFTP</code>, <code>FTP</code>) alongside Immich,
+rsync, USB, and local folder — so they&#x27;re discoverable rather than hidden inside an
+&quot;rclone&quot; type. The chosen destination sets the stored <code>type</code>+<code>backend</code>; Google Drive shows
+an inline hint for the <code>rclone authorize &quot;drive&quot;</code> token step. (Earlier, only <code>local_folder</code>
+had a typed field, so every other type failed adapter validation with a &quot;missing required
+settings&quot; error.) Secret fields offer a <strong>show/hide</strong> reveal so an operator can verify a
+pasted key, and the <strong>Test</strong> action fails fast (bounded connect/IO timeout, no retries) so
+a wrong endpoint reports an error in seconds instead of hanging.</p>
+<p>Secrets are <strong>write-only</strong> (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/write-only-remote-secrets">ADR-0020</a>):</p>
+<ul>
+<li class=""><strong>Redacted on read.</strong> The <code>/sync/remotes</code> responses replace each secret value with a
+fixed sentinel; real credentials never travel back to the browser. The redaction happens
+only at the HTTP boundary — internal callers (test, sync worker, share upload) keep using
+the raw stored settings. Which keys are secret is backend/type-aware (S3
+<code>secret_access_key</code>; WebDAV/FTP/SFTP <code>pass</code>; Drive <code>token</code>/<code>client_secret</code>; Immich
+<code>api_key</code>).</li>
+<li class=""><strong>Blank keeps on update.</strong> On edit, secret fields render blank (&quot;leave blank to keep&quot;).
+A secret left blank (or echoing the sentinel) is merged back to the stored value, so an
+operator can fix a typo&#x27;d endpoint without re-entering credentials; a non-empty value
+rotates the secret.</li>
+</ul>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="share-remote-and-qr-sharing">Share remote and QR sharing<a href="#share-remote-and-qr-sharing" class="hash-link" aria-label="Direct link to Share remote and QR sharing" title="Direct link to Share remote and QR sharing" translate="no">​</a></h3>
 <p>One enabled remote is designated the <strong>share remote</strong> that backs guest QR sharing
 (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/cloud-share-services-and-qr">ADR-0018</a>). Because guest phones cannot
@@ -201,18 +314,25 @@ the recommended QR backend).</p>
 <li class=""><code>share_remote_id</code> — which remote backs the QR.</li>
 <li class=""><code>link_mode</code> — <code>sharepage</code> (default, the themed arcade grab page) or <code>direct</code>.</li>
 <li class=""><code>public_link_template</code> — placeholders <code>{key}</code>, <code>{event}</code>, <code>{filename}</code>.</li>
-<li class=""><code>sharepage_url</code> — base URL of the deployed static sharepage.</li>
+<li class=""><code>sharepage_url</code> — base URL where the deployed sharepage and the photos live (the QR
+encodes <code>{sharepage_url}/index.html?id={key}</code>). On object stores it must include the
+bucket, e.g. <code>https://host/bucket</code>.</li>
 <li class=""><code>link_expiry_days</code> — privacy/lifecycle hint (the host enforces expiry).</li>
 <li class=""><code>share_variant</code> — <code>final</code> (default) or <code>original</code>.</li>
 </ul>
 <p>Admin actions: designate the share remote, edit the link template / sharepage toggle /
-expiry, run &quot;test remote&quot;, and show a <strong>live share-link preview</strong> for the active event.
-The host stays a dumb static/file server — no server-side script — so admin only supplies
-the upload target plus the link template; credentials stay in the remote&#x27;s type-specific
-settings, redacted on read.</p>
-<p>The <code>scripts/share-host-setup</code> helper (a local operator script — never host-side) deploys
-the static <code>apps/sharepage</code> to the upload target via rclone and prints the exact Remotes +
-Sharing values to paste here, so first-time setup is copy-paste rather than hand-derived.</p>
+expiry, run &quot;test remote&quot;, <strong>deploy the sharepage</strong>, and show a <strong>live share-link preview</strong>
+for the active event. The host stays a dumb static/file server — no server-side script — so
+admin only supplies the upload target plus the link template; credentials stay in the
+remote&#x27;s type-specific settings, redacted on read.</p>
+<p><strong>Deploy sharepage</strong> (on the share remote&#x27;s row) uploads <code>apps/sharepage/index.html</code> to the
+remote&#x27;s root using the credentials it already stores, so the operator deploys the page from
+admin without re-entering keys (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/in-app-sharepage-deploy">ADR-0021</a>). The
+<code>scripts/share-host-setup</code> helper (a local operator script — never host-side) does the same
+from the command line and additionally prints the Remotes + Sharing values to paste here; it
+is the <strong>fallback</strong> for bootstrapping a host before a remote exists, or for CI.</p>
+<p>For an end-to-end operator walkthrough (deploy the sharepage, add the share remote, enable
+QR, verify), see <a class="" href="/pixelbooth-docs/reference/operator/qr-sharing-setup">QR Sharing Setup</a>.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="reference-frontend-ideas-to-keep">Reference Frontend Ideas To Keep<a href="#reference-frontend-ideas-to-keep" class="hash-link" aria-label="Direct link to Reference Frontend Ideas To Keep" title="Direct link to Reference Frontend Ideas To Keep" translate="no">​</a></h2>
 <ul>
 <li class="">One frontend application with kiosk, gallery, admin, and standalone display routes.</li>
@@ -233,6 +353,6 @@ Sharing values to paste here, so first-time setup is copy-paste rather than hand
 <li class="">Keep localization out of the critical path for V1.</li>
 <li class="">Use one React design system and custom UX for high-value controls instead of relying on generic generated forms everywhere.</li>
 <li class="">Store transactional state in SQLite, with JSON import/export for portability.</li>
-</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/architecture/admin-control-plane.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/pixelbooth-docs/reference/architecture/backend-runtime-decision"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Backend Runtime Decision</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/pixelbooth-docs/reference/architecture/camera-lighting"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Camera And Lighting Architecture</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#admin-information-architecture" class="table-of-contents__link toc-highlight">Admin Information Architecture</a></li><li><a href="#dashboard-first" class="table-of-contents__link toc-highlight">Dashboard First</a></li><li><a href="#settings-and-templates" class="table-of-contents__link toc-highlight">Settings And Templates</a></li><li><a href="#assets-and-file-browser" class="table-of-contents__link toc-highlight">Assets And File Browser</a></li><li><a href="#overlay-concept" class="table-of-contents__link toc-highlight">Overlay Concept</a></li><li><a href="#commander" class="table-of-contents__link toc-highlight">Commander</a></li><li><a href="#remotes-and-synchronizer" class="table-of-contents__link toc-highlight">Remotes And Synchronizer</a><ul><li><a href="#share-remote-and-qr-sharing" class="table-of-contents__link toc-highlight">Share remote and QR sharing</a></li></ul></li><li><a href="#reference-frontend-ideas-to-keep" class="table-of-contents__link toc-highlight">Reference Frontend Ideas To Keep</a></li><li><a href="#reference-frontend-ideas-to-improve" class="table-of-contents__link toc-highlight">Reference Frontend Ideas To Improve</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/architecture/admin-control-plane.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/pixelbooth-docs/reference/architecture/backend-runtime-decision"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Backend Runtime Decision</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/pixelbooth-docs/reference/architecture/camera-lighting"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Camera And Lighting Architecture</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#admin-information-architecture" class="table-of-contents__link toc-highlight">Admin Information Architecture</a><ul><li><a href="#theme-and-density" class="table-of-contents__link toc-highlight">Theme And Density</a></li><li><a href="#saving-settings" class="table-of-contents__link toc-highlight">Saving Settings</a></li></ul></li><li><a href="#dashboard-first" class="table-of-contents__link toc-highlight">Dashboard First</a></li><li><a href="#settings-and-templates" class="table-of-contents__link toc-highlight">Settings And Templates</a></li><li><a href="#assets-and-file-browser" class="table-of-contents__link toc-highlight">Assets And File Browser</a></li><li><a href="#overlay-concept" class="table-of-contents__link toc-highlight">Overlay Concept</a></li><li><a href="#commander" class="table-of-contents__link toc-highlight">Commander</a></li><li><a href="#remotes-and-synchronizer" class="table-of-contents__link toc-highlight">Remotes And Synchronizer</a><ul><li><a href="#share-remote-and-qr-sharing" class="table-of-contents__link toc-highlight">Share remote and QR sharing</a></li></ul></li><li><a href="#reference-frontend-ideas-to-keep" class="table-of-contents__link toc-highlight">Reference Frontend Ideas To Keep</a></li><li><a href="#reference-frontend-ideas-to-improve" class="table-of-contents__link toc-highlight">Reference Frontend Ideas To Improve</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
 </body>
 </html>

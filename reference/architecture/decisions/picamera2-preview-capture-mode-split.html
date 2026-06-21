@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-architecture/decisions/picamera2-preview-capture-mode-split" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.10.1">
+<title data-rh="true">ADR-0024: Low-latency Picamera2 preview via a light video config + hardware MJPEG encoder, switching to the native still config only for capture | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/decisions/picamera2-preview-capture-mode-split"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="ADR-0024: Low-latency Picamera2 preview via a light video config + hardware MJPEG encoder, switching to the native still config only for capture | Pixelbooth Docs"><meta data-rh="true" name="description" content="- Status: Accepted"><meta data-rh="true" property="og:description" content="- Status: Accepted"><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/decisions/picamera2-preview-capture-mode-split"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/decisions/picamera2-preview-capture-mode-split" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/decisions/picamera2-preview-capture-mode-split" hreflang="x-default"><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
+</head>
+<body>
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||"light"),document.documentElement.setAttribute("data-theme-choice",t||"light")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_SfMd" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/pixelbooth-docs/"><div class="navbar__logo"><img src="/pixelbooth-docs/img/logo.svg" alt="Pixelbooth" class="themedComponent_APyr themedComponent--light_EO7i"><img src="/pixelbooth-docs/img/logo.svg" alt="Pixelbooth" class="themedComponent_APyr themedComponent--dark_pCh9"></div><b class="navbar__title text--truncate">Pixelbooth</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/pixelbooth-docs/">Start</a><a class="navbar__item navbar__link" href="/pixelbooth-docs/roadmap">Roadmap</a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/pixelbooth-docs/reference">Reference</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/Katrines-Kaelder/pixelbooth" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_zVqi"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_d0wt colorModeToggle_UA7r"><button class="clean-btn toggleButton_QTuX toggleButtonDisabled_VJ6V" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd lightToggleIcon_qTfc"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd darkToggleIcon_chyJ"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_sqnd systemToggleIcon_zMbt"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_mV6h"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_VHsW"><div class="docsWrapper_RrKg"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_yQBR" type="button"></button><div class="docRoot_hbZ6"><main class="docMainContainer_qe5w docMainContainerEnhanced_T44m"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_xk77"><div class="docItemContainer_l7WK"><article><div class="tocCollapsible_YFIb theme-doc-toc-mobile tocMobile_RDqH"><button type="button" class="clean-btn tocCollapsibleButton_yU99">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>ADR-0024: Low-latency Picamera2 preview via a light video config + hardware MJPEG encoder, switching to the native still config only for capture</h1></header>
+<ul>
+<li class=""><strong>Status</strong>: Accepted</li>
+<li class=""><strong>Date</strong>: 2026-06-21</li>
+<li class=""><strong>Amends</strong>: <a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-native-stills-dual-stream">ADR-0022</a></li>
+<li class=""><strong>Related</strong>: <a class="" href="/pixelbooth-docs/reference/architecture/decisions/picamera2-csi-adapter-bare-metal">ADR-0009</a>, <a class="" href="/pixelbooth-docs/reference/architecture/decisions/usb-v4l2-camera-adapter-brought-forward">ADR-0008</a></li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="context">Context<a href="#context" class="hash-link" aria-label="Direct link to Context" title="Direct link to Context" translate="no">​</a></h2>
+<p>ADR-0022 made the Picamera2 (CSI) adapter run <strong>one <code>create_still_configuration</code></strong> with a
+native-resolution <code>main</code> stream and a small <code>lores</code> stream, serving live preview from <code>lores</code>
+and stills from <code>main</code> <em>off the same continuously-running still configuration</em>. It explicitly
+deferred the reference app&#x27;s <code>switch_mode</code> design as a &quot;thermal optimisation follow-up&quot; if
+continuous full-res preview proved costly.</p>
+<p>Hardware validation (KI-003) showed the live preview is <strong>noticeably delayed</strong> and the frame
+rate feels far below what a local feed should manage. Two root causes, both on the producer:</p>
+<ol>
+<li class=""><strong>The sensor mode is pinned to full resolution by the still config.</strong> On Camera Module 3
+(IMX708) the native <code>4608x2592</code> readout tops out around ~14 fps, and <code>main</code> + <code>lores</code> are
+derived from that one sensor mode — so the lores preview inherits the ~14 fps ceiling no
+matter how cheap the lores stream itself is. Running native res <em>continuously</em> just to
+preview also loads the ISP, which is what makes the feed trail live motion.</li>
+<li class=""><strong>Preview pulled frames with per-frame <code>capture_file(name=&quot;lores&quot;, format=&quot;jpeg&quot;)</code>.</strong> Each
+frame re-entered the capture pipeline in Python instead of letting a hardware encoder push
+frames, adding latency and capping throughput.</li>
+</ol>
+<p>The touchscreen <em>input</em> is instant; only the <strong>video feed</strong> lags. So this is purely the camera
+pipeline — not the browser compositor and not the CRT/scanline overlay.</p>
+<p>The native-resolution ORIGINAL contract from ADR-0022 (and the runtime capture-size setting)
+must be preserved: this changes <em>how the sensor runs while previewing</em>, not the captured
+resolution.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="decision">Decision<a href="#decision" class="hash-link" aria-label="Direct link to Decision" title="Direct link to Decision" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="two-configurations-switched-per-capture-supersedes-adr-0022s-single-still-config">Two configurations, switched per capture (supersedes ADR-0022&#x27;s single-still-config)<a href="#two-configurations-switched-per-capture-supersedes-adr-0022s-single-still-config" class="hash-link" aria-label="Direct link to Two configurations, switched per capture (supersedes ADR-0022&#x27;s single-still-config)" title="Direct link to Two configurations, switched per capture (supersedes ADR-0022&#x27;s single-still-config)" translate="no">​</a></h3>
+<p>Each camera builds <strong>two</strong> configurations at open time:</p>
+<ul>
+<li class="">a <strong>preview</strong> config — <code>create_video_configuration</code> with a <code>main</code>
+(<code>preview_main_width/height</code>, default <code>2304x1296</code>, the <strong>full-FoV</strong> 2x2-binned IMX708 mode)
+and a <code>lores</code> stream sized to the preview budget (<code>preview_width/height</code>), <code>encode=&quot;lores&quot;</code>,
+<code>controls={&quot;FrameRate&quot;: preview_fps}</code> (default <code>30</code>); and</li>
+<li class="">a <strong>capture</strong> config — the ADR-0022 <code>create_still_configuration</code> with the native (or
+runtime-capped) <code>main</code> and a matching <code>lores</code>.</li>
+</ul>
+<p>These preview knobs are <strong>runtime, admin-editable settings</strong>, not env config. They live in the
+SQLite-backed <code>camera</code> settings section (<code>domain/settings.py</code>), read live by the adapter through
+a <code>PreviewTuning</code> provider on every open/reconfigure — mirroring how the per-format render output
+sizes live in <code>CaptureSettings</code> (ADR-0017). The env <code>Settings</code> keep only the USB/fake bootstrap
+preview budget. A successful patch to the <code>camera</code> section calls <code>refresh_preview_tuning</code>, which
+<code>switch_mode</code>s any <strong>open</strong> camera to a freshly built preview config in place, so a change applies
+on the next preview reconnect rather than only on a cold open.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="image-flip-orientation">Image flip (orientation)<a href="#image-flip-orientation" class="hash-link" aria-label="Direct link to Image flip (orientation)" title="Direct link to Image flip (orientation)" translate="no">​</a></h3>
+<p>The <code>camera</code> section also carries an <strong>image flip</strong> applied via a libcamera <code>Transform</code>:
+<code>flip_horizontal</code> (mirror), <code>flip_vertical</code>, and a <code>flip_scope</code>. The flip always applies to the
+preview config; for the capture config it applies only when <code>flip_scope == &quot;all&quot;</code> (the camera is
+physically mounted mirrored/rotated, so the saved still must match), and is omitted under
+<code>preview_only</code> (selfie-mirror UX — the live preview is mirrored but the saved photo is not, so
+text stays readable). <code>Transform</code> is imported lazily (same system <code>python3-picamera2</code> package),
+so the fake/dev/CI paths never require libcamera.</p>
+<p>The camera <strong>idles in the preview config</strong>, so the sensor runs a fast low-resolution mode and
+the lores preview is unthrottled. For a still (or a burst), the adapter takes the per-role lock,
+stops the encoder, <code>switch_mode</code>s to the capture config, captures <code>main</code> at native resolution,
+<code>switch_mode</code>s back to the preview config, and restarts the encoder. The captured ORIGINAL is
+therefore still native — only the <em>idle</em> sensor mode changed.</p>
+<p><strong>Field-of-view must match.</strong> Preview and capture use <em>different</em> sensor modes, so the preview
+<code>main</code> must select a mode with the <strong>same field of view</strong> as the native still, or the preview
+looks cropped/zoomed relative to the saved photo (KI-003). On the IMX708 the 2x2-binned
+<code>2304x1296</code> mode is full-FoV (~56fps, well above 30) and is the default; the higher-fps
+<code>1536x864</code> mode is a <em>cropped</em> readout and is intentionally avoided despite its headroom. Lores
+inherits the main&#x27;s FoV (it is an ISP downscale of the same field), so matching the main mode is
+sufficient.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="continuous-hardware-mjpeg-encoder-feeding-a-latest-frame-buffer">Continuous hardware MJPEG encoder feeding a latest-frame buffer<a href="#continuous-hardware-mjpeg-encoder-feeding-a-latest-frame-buffer" class="hash-link" aria-label="Direct link to Continuous hardware MJPEG encoder feeding a latest-frame buffer" title="Direct link to Continuous hardware MJPEG encoder feeding a latest-frame buffer" translate="no">​</a></h3>
+<p>While previewing, a Picamera2 <code>MJPEGEncoder</code> runs continuously on the <code>lores</code> stream, writing
+each hardware-encoded JPEG into a small <code>BufferedIOBase</code> sink (<code>FileOutput</code>) that keeps <strong>only
+the newest frame</strong> and bumps a sequence counter (the reference app&#x27;s <code>PicamLoresData</code> pattern).
+<code>stream_frames</code> blocks on that buffer&#x27;s condition and yields the freshest frame, so a slow or
+reconnecting client never drains a backlog — the feed stays realtime. This replaces per-frame
+<code>capture_file</code> for preview; stills still use <code>capture_file(name=&quot;main&quot;)</code>.</p>
+<p>Preview no longer holds the per-role lock per frame (it waits on the buffer), so capture and
+preview still serialize through the lock, but preview only pauses for the brief <code>switch_mode</code>
+window around a capture (an accepted trade-off, as in ADR-0022).</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="scope-of-the-protocol">Scope of the protocol<a href="#scope-of-the-protocol" class="hash-link" aria-label="Direct link to Scope of the protocol" title="Direct link to Scope of the protocol" translate="no">​</a></h3>
+<p>The core <code>CameraAdapter</code> surface — <code>discover</code> / <code>is_available</code> / <code>capture_test</code> /
+<code>capture_sequence</code> / <code>stream_frames</code> / <code>close</code> — keeps the same signatures, so <code>CameraService</code>
+and the MJPEG endpoint are untouched. The protocol gains two small methods: <code>measured_fps(role)</code>
+(the real producer fps the live encoder is delivering, surfaced on the dashboard via
+<code>GET /system/metrics</code>; <code>None</code> when idle) and <code>refresh_preview_tuning()</code> (apply an updated <code>camera</code>
+section to any open camera). Both are no-ops on the fake and USB adapters — only the Picamera2
+adapter measures fps and live-reconfigures.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="consequences">Consequences<a href="#consequences" class="hash-link" aria-label="Direct link to Consequences" title="Direct link to Consequences" translate="no">​</a></h2>
+<ul>
+<li class="">Live preview runs a fast sensor mode at the configured <code>preview_fps</code> with hardware JPEG and
+latest-frame delivery, removing the ~14 fps ceiling and the per-frame Python encode — the
+intended fix for KI-003.</li>
+<li class="">The captured ORIGINAL stays native (ADR-0022 contract intact); capture resolution remains the
+runtime, admin-editable setting. Final image quality is unchanged.</li>
+<li class="">Each capture incurs one <code>switch_mode</code> round-trip (brief preview pause), pre-switchable during
+the countdown later if the pause is visible; bursts switch once for the whole sequence.</li>
+<li class="">The encoder runs whenever a camera is open; it is stopped and the camera released on <code>close()</code>,
+and the buffer is signalled closed so in-flight preview generators end promptly (KI-012).</li>
+<li class="">Exact IMX708 preview-mode framerates and the chosen <code>preview_main</code> size are <strong>to be verified on
+the target Pi</strong> (KI-003 next action); the default full-FoV <code>2304x1296</code> is the starting point.
+Because the knobs are now runtime <code>camera</code> settings with the measured fps on the dashboard, this
+tuning is done live in admin (no restart) instead of by editing env and redeploying.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="alternatives-considered">Alternatives considered<a href="#alternatives-considered" class="hash-link" aria-label="Direct link to Alternatives considered" title="Direct link to Alternatives considered" translate="no">​</a></h2>
+<ul>
+<li class=""><strong>Keep ADR-0022&#x27;s single continuous still config.</strong> Rejected: it pins the sensor to the slow
+full-res mode, which is the KI-003 latency itself.</li>
+<li class=""><strong>Lower the capture resolution to speed preview.</strong> Rejected: it degrades the ORIGINAL and
+every downstream output/overlay, and is unnecessary — the mode split keeps capture native.</li>
+<li class=""><strong>Switch transport to WebRTC / libcamera-native.</strong> Deferred: far more complex, and unnecessary
+for a same-device kiosk where MJPEG over loopback is effectively free; the preview provider
+stays abstract so this remains open if tuned MJPEG is ever insufficient.</li>
+<li class=""><strong>A dedicated worker thread pumping <code>capture_metadata</code> (full reference-app shape).</strong> Not
+adopted: the lock-plus-encoder model delivers the same latency win with less machinery and
+no bespoke per-role arbitration thread; the worker&#x27;s exposure-stats side benefit is unused.</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/architecture/decisions/0024-picamera2-preview-capture-mode-split.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#context" class="table-of-contents__link toc-highlight">Context</a></li><li><a href="#decision" class="table-of-contents__link toc-highlight">Decision</a><ul><li><a href="#two-configurations-switched-per-capture-supersedes-adr-0022s-single-still-config" class="table-of-contents__link toc-highlight">Two configurations, switched per capture (supersedes ADR-0022&#39;s single-still-config)</a></li><li><a href="#image-flip-orientation" class="table-of-contents__link toc-highlight">Image flip (orientation)</a></li><li><a href="#continuous-hardware-mjpeg-encoder-feeding-a-latest-frame-buffer" class="table-of-contents__link toc-highlight">Continuous hardware MJPEG encoder feeding a latest-frame buffer</a></li><li><a href="#scope-of-the-protocol" class="table-of-contents__link toc-highlight">Scope of the protocol</a></li></ul></li><li><a href="#consequences" class="table-of-contents__link toc-highlight">Consequences</a></li><li><a href="#alternatives-considered" class="table-of-contents__link toc-highlight">Alternatives considered</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+</body>
+</html>

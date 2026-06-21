@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">API Contract | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="API Contract | Pixelbooth Docs"><meta data-rh="true" name="description" content="Base path: /api/v1."><meta data-rh="true" property="og:description" content="Base path: /api/v1."><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"API Contract","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.5a14e451.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.c23f4538.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -341,20 +341,45 @@ bytes and records the outcome on the media record (<code>overlay_status</code>).
 <ul>
 <li class=""><code>GET /sync/remotes</code>
 <ul>
-<li class="">Lists configured remotes and common status.</li>
+<li class="">Lists configured remotes and common status. Type-specific <code>settings</code> are returned with
+<strong>secret values redacted</strong> to a sentinel (write-only secrets,
+<a class="" href="/pixelbooth-docs/reference/architecture/decisions/write-only-remote-secrets">ADR-0020</a>); the same redaction applies to
+every response carrying a <code>RemoteRecord</code>.</li>
 </ul>
 </li>
 <li class=""><code>POST /sync/remotes</code>
 <ul>
-<li class="">Creates a remote with common settings and type-specific settings.</li>
+<li class="">Creates a remote with common settings and type-specific settings. Sync frequency is the
+<code>trigger</code> plus optional <code>interval_seconds</code> (e.g. <code>scheduled</code> + <code>300</code> = every 5 minutes;
+<code>on_capture_complete</code> / <code>manual</code> carry no interval). The response redacts secrets.</li>
 </ul>
 </li>
 <li class=""><code>GET /sync/remotes/{id}</code></li>
-<li class=""><code>PUT /sync/remotes/{id}</code></li>
+<li class=""><code>PUT /sync/remotes/{id}</code>
+<ul>
+<li class="">Updates a remote. A secret <code>settings</code> field sent <strong>blank or as the redaction sentinel
+keeps the stored credential</strong>; any other value rotates it. <code>trigger</code> and
+<code>interval_seconds</code> are a pair — sending <code>trigger</code> sets both; omitting it keeps both. The
+response redacts secrets.</li>
+</ul>
+</li>
 <li class=""><code>DELETE /sync/remotes/{id}</code></li>
 <li class=""><code>POST /sync/remotes/{id}/test</code>
 <ul>
-<li class="">Runs a connection/config test without syncing all media.</li>
+<li class="">Runs a connection/config test without syncing all media. On success the message names
+the remote (e.g. <em>&quot;Connected to &#x27;Event NAS&#x27;.&quot;</em>); on failure it carries the adapter&#x27;s
+diagnostic detail. rclone remotes use a bounded connect/IO timeout with retries disabled
+so a wrong endpoint fails in seconds instead of hanging.</li>
+</ul>
+</li>
+<li class=""><code>POST /sync/remotes/{id}/deploy-sharepage</code>
+<ul>
+<li class="">Uploads the static guest sharepage (<code>apps/sharepage/index.html</code>) to the remote&#x27;s root
+(<code>index.html</code>) using the remote&#x27;s <strong>stored credentials</strong>, so the operator deploys the
+page from admin without re-entering keys (<a class="" href="/pixelbooth-docs/reference/architecture/decisions/in-app-sharepage-deploy">ADR-0021</a>).
+Only static-host remotes (<code>rclone</code>, <code>local_folder</code>) are accepted; others return <code>422</code>.
+The response carries <code>ok</code>, a user-safe <code>message</code>, the public <code>url</code> (when configured),
+and a <code>diagnostic_id</code> on failure.</li>
 </ul>
 </li>
 <li class=""><code>POST /sync/remotes/{id}/sync</code>
