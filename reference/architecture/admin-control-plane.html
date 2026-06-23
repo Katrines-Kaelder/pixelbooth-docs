@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Admin Control Plane | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Admin Control Plane | Pixelbooth Docs"><meta data-rh="true" name="description" content="Pixelbooth has one frontend application. The guest booth, gallery, admin, setup, and future companion display views live in the same React app and share one API/event model. Admin is not a separate product or an afterthought; it is the operator control plane for the appliance."><meta data-rh="true" property="og:description" content="Pixelbooth has one frontend application. The guest booth, gallery, admin, setup, and future companion display views live in the same React app and share one API/event model. Admin is not a separate product or an afterthought; it is the operator control plane for the appliance."><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Admin Control Plane","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/admin-control-plane"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.5722e56d.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.b45db21c.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -31,16 +31,27 @@ roadmap work so it has a place to land):</p>
 <li class=""><strong>Dashboard</strong> (<code>/admin</code>): opening-night readiness, system health, recent activity,
 storage, temperature, camera/lighting/sync/print status, and safe quick actions.
 Full-width, no sidebar.</li>
-<li class=""><strong>Capture</strong> (<code>/admin/capture/*</code>): <code>cameras</code> <em>(later)</em>, <code>modes</code> (capture settings:
-countdown, retake, default preset, and the per-format render output sizes), and
-<code>overlays</code> (overlay library + PNG preview + future designer). Exposure and lighting
-<em>(later)</em> land here too.</li>
+<li class=""><strong>Capture</strong> (<code>/admin/capture/*</code>): <code>cameras</code> (live preview, focus, exposure, and
+orientation for the CSI cameras), <code>modes</code> (capture settings, presented as an inner
+sub-sidebar — <strong>Basics</strong> plus one sub-view per mode: <strong>Photo</strong>, <strong>Collage</strong>, <strong>GIF</strong>,
+<strong>Video</strong> — with operator-facing labels and hints rather than raw setting keys, KI-036),
+and <code>overlays</code> (overlay library + PNG preview + future designer). The mode sub-views all
+edit the one <code>capture</code> settings section, so they flow through the shared settings draft
+and the &quot;Save all changes&quot; bar.</li>
+<li class=""><strong>Lighting</strong> (<code>/admin/lighting/*</code>): <code>status</code> (live lighting health + per-preset test
+actions), <code>device</code> (backend select — fake/WLED/ESP32 — and its connection, saved to the
+<code>lighting</code> settings section and applied live), <code>presets</code> (map each booth preset to a
+saved WLED scene id), and <code>exposure</code> (the named exposure profiles + the active one, with
+the ring-light brightness/warm-cold calibration applied live and camera intent stored for
+the deferred coordinated metering). See [ADR-0026/0027/0028/0029] and camera-lighting.md.</li>
 <li class=""><strong>Experience</strong> (<code>/admin/experience/*</code>): <code>booth</code> (attract text, idle timeout,
 language, <code>show_pics_taken</code> — the attract SNAPS counter, <code>crt_scanlines</code> —
 the guest-screen CRT scanline overlay strength: <code>off</code>/<code>subtle</code>/<code>full</code>, a first
 slice of FR-004, see KI-011, and <code>auto_return_enabled</code>/<code>auto_return_seconds</code> —
-the inactivity auto-return from abandoned result/mode-select/error screens back
-to attract, see KI-027) and <code>event</code> (active
+the auto-return window: it sets how long the result (<code>present</code>) screen is shown
+before the session auto-completes back to attract — backend-driven via
+<code>SessionTiming.present_seconds</code> — and the frontend inactivity timeout for the
+abandoned <code>mode-select</code>/<code>error</code> screens, see KI-027) and <code>event</code> (active
 event/profile name, slug, and gallery presentation: <code>gallery_enabled</code>,
 <code>gallery_page_size</code>, <code>gallery_newest_first</code>, all read by the guest gallery).
 Theme/branding and marquee <em>(later)</em>.</li>
@@ -69,9 +80,11 @@ few oversized panels, so an operator can read readiness at a glance.</p>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="saving-settings">Saving Settings<a href="#saving-settings" class="hash-link" aria-label="Direct link to Saving Settings" title="Direct link to Saving Settings" translate="no">​</a></h3>
 <p>Settings edits accumulate as a <strong>draft</strong> across the settings sub-sections. A single
 prominent <strong>&quot;Save all changes&quot;</strong> action (with an unsaved-changes count and a discard)
-commits every pending section at once; per-section save remains available as a
-secondary, de-emphasized control. Purpose-built editors (sharing, remotes) keep their
-own scoped save.</p>
+commits every pending section at once. Each section card also carries its own
+<strong>&quot;Save section&quot;</strong> control that reads as a <strong>strong primary CTA the moment that
+section becomes dirty</strong> and a clearly disabled, de-emphasized control when the section
+is clean (KI-038), so an operator never edits a card without noticing it needs saving.
+Purpose-built editors (sharing, remotes) keep their own scoped save.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="dashboard-first">Dashboard First<a href="#dashboard-first" class="hash-link" aria-label="Direct link to Dashboard First" title="Direct link to Dashboard First" translate="no">​</a></h2>
 <p>The admin landing view should answer &quot;can we open the booth now?&quot; without forcing the operator to inspect every panel.</p>
 <p>Dashboard sections:</p>

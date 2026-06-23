@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">Camera And Lighting Architecture | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Camera And Lighting Architecture | Pixelbooth Docs"><meta data-rh="true" name="description" content="Camera Roles"><meta data-rh="true" property="og:description" content="Camera Roles"><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Camera And Lighting Architecture","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/camera-lighting"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.5722e56d.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.b45db21c.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -164,8 +164,45 @@ than re-encoding per frame, to keep the local feed realtime. The documented budg
 <li class="">Admin diagnostics must include a test that switching preview roles also changes the camera used for a real capture.</li>
 </ul>
 <p>The preview selector must also work in degraded mode. If only one real camera is available, the selector collapses to that role and compatible modes still work.</p>
+<h2 class="anchor anchorTargetStickyNavbar_OywG" id="lighting-service-and-adapters">Lighting Service And Adapters<a href="#lighting-service-and-adapters" class="hash-link" aria-label="Direct link to Lighting Service And Adapters" title="Direct link to Lighting Service And Adapters" translate="no">​</a></h2>
+<p>Lighting sits behind an explicit service/adapter boundary, mirroring the camera stack
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/lighting-service-and-adapter-boundary">ADR-0026</a>). The
+<code>LightingService</code> depends only on the <code>LightingAdapter</code> protocol
+(<code>discover</code>/<code>is_available</code>/<code>apply_preset</code>/<code>current_preset</code>/<code>close</code>), so a missing or
+failed light degrades instead of crashing the booth. The booth has one lighting setup, so
+the device is configured as a <strong>persisted, admin-editable <code>lighting</code> settings section</strong>
+(backend + connection + per-preset WLED scene overrides), not env
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/wled-json-api-adapter">ADR-0027</a>). The <code>backend</code> field selects the
+adapter (and <code>use_fake_hardware</code> pins fake off-Pi):</p>
+<ul>
+<li class=""><code>fake</code> (default off-Pi): a deterministic in-memory adapter exposing predictable state
+(current preset + apply count) so the service, the session→preset mapping, and UI/tests
+work without real lights.</li>
+<li class=""><code>wled</code>: a real WLED controller over its JSON API — see <a href="#wled-adapter" class="">WLED Adapter</a>.</li>
+<li class=""><code>esp32</code>: the custom serial/TCP firmware — see <a href="#custom-esp32-adapter" class="">Custom ESP32 Adapter</a>.</li>
+</ul>
+<p>The service is <strong>config-driven</strong>: it reads the live <code>lighting</code> section through a provider
+and lazily rebuilds (and closes) its adapter whenever the config changes, so an admin edit
+to the backend/host/calibration takes effect without a restart — the rest of the service
+never cares which adapter is active. <code>apply_preset</code> publishes a <code>lighting.status</code> event
+(the <code>LightingSnapshot</code>: devices, active preset, health) so the kiosk/admin can reflect
+lighting live, and any hardware failure returns a user-safe message + recovery + diagnostic
+id (never a silent failure). Lighting health is surfaced in admin diagnostics next to the
+camera. The API exposes <code>GET /lighting/devices</code> (guest-open status) and <code>POST /lighting/test</code>
+(admin preset test); persistent preset-mapping (<code>GET /lighting/presets</code>) and the admin
+lighting UI are later Stage 5 tasks.</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="default-looks-vs-operator-scenes">Default looks vs operator scenes<a href="#default-looks-vs-operator-scenes" class="hash-link" aria-label="Direct link to Default looks vs operator scenes" title="Direct link to Default looks vs operator scenes" translate="no">​</a></h3>
+<p>Each booth preset has a built-in default &quot;look&quot; — a solid colour + brightness + crossfade
+shared by every backend (<code>adapters/lighting/looks.py</code>). On WLED these render as the
+universally-stable Solid effect (<code>fx:0</code>) so they do not depend on build-specific effect or
+palette ids. An operator who wants richer effects maps a booth preset to a <strong>saved WLED
+preset id</strong> (<code>preset_wled_ids</code>), and the adapter then selects that scene (<code>{&quot;ps&quot;:id}</code>)
+instead of the built-in look.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="lighting-events">Lighting Events<a href="#lighting-events" class="hash-link" aria-label="Direct link to Lighting Events" title="Direct link to Lighting Events" translate="no">​</a></h2>
-<p>Lighting is event-driven. Session state changes map to presets:</p>
+<p>Lighting is event-driven. Booth session state changes map to presets; the
+<code>LightingSessionCoordinator</code> plugs into the documented <code>SessionCoordinator</code> seam and
+applies the mapped preset on every transition (a lighting fault degrades the show and
+never breaks the capture path). Presets:</p>
 <ul>
 <li class="">idle</li>
 <li class="">attract</li>
@@ -176,9 +213,26 @@ than re-encoding per frame, to keep the local feed realtime. The documented budg
 <li class="">error</li>
 <li class="">challenge</li>
 </ul>
+<p>The session-state → preset mapping is: <code>idle→idle</code>, <code>attract→attract</code>,
+<code>countdown→countdown</code>, <code>capture→capture</code>, <code>record→capture</code> (recording is the capture
+phase for composed formats), <code>review→review</code>, <code>processing→review</code>, <code>present→success</code>,
+<code>complete→idle</code>, <code>error→error</code>. The <code>challenge</code> preset stays unused until the Stage 9
+challenge states exist.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="exposure-and-ring-light">Exposure And Ring Light<a href="#exposure-and-ring-light" class="hash-link" aria-label="Direct link to Exposure And Ring Light" title="Direct link to Exposure And Ring Light" translate="no">​</a></h2>
 <p>Exposure control is separate from decorative lighting. The booth must handle both bright room lights and dark club mode with dancefloor lighting.</p>
-<p>This area lands in two parts:</p>
+<p>This area lands in parts:</p>
+<h3 class="anchor anchorTargetStickyNavbar_OywG" id="exposure-profiles--ring-light-calibration-implemented--adr-0029">Exposure profiles + ring-light calibration (implemented — ADR-0029)<a href="#exposure-profiles--ring-light-calibration-implemented--adr-0029" class="hash-link" aria-label="Direct link to Exposure profiles + ring-light calibration (implemented — ADR-0029)" title="Direct link to Exposure profiles + ring-light calibration (implemented — ADR-0029)" translate="no">​</a></h3>
+<p>Exposure is configured as named <strong>profiles</strong> in an admin-editable <code>exposure</code> settings
+section — the four documented profiles (<code>normal_lights</code>, <code>club_mode</code>,
+<code>manual_event_locked</code>, <code>calibrated_auto</code>) plus the active selection. Each profile bundles a
+ring-light <strong>calibration</strong> (<code>ring_brightness</code> ceiling + <code>warm_cold</code> mix) with camera
+exposure intent (<code>exposure_value</code>, metering, exposure mode).</p>
+<p>The <strong>ring-light half is applied now</strong>: the active profile&#x27;s <code>ring_brightness</code> and
+<code>warm_cold</code> flow into the resolved <code>LightingConfig</code>, scaling each lighting look&#x27;s brightness
+and driving the WLED segment <code>cct</code> (0 warm … 255 cold) — so switching profiles recalibrates
+the lights live through the config-driven <code>LightingService</code> (ADR-0027). The camera fields are
+stored and surfaced for the coordinated service below but are <strong>not</strong> wired into the
+hardware-verified sensor control path (ADR-0025), which keeps owning live camera exposure.</p>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="sensor-side-camera-exposure-implemented--adr-0025">Sensor-side camera exposure (implemented — ADR-0025)<a href="#sensor-side-camera-exposure-implemented--adr-0025" class="hash-link" aria-label="Direct link to Sensor-side camera exposure (implemented — ADR-0025)" title="Direct link to Sensor-side camera exposure (implemented — ADR-0025)" translate="no">​</a></h3>
 <p>The camera-only slice runs <strong>now</strong>: the sensor&#x27;s own auto-exposure/auto-gain (AEC/AGC) and
 auto-white-balance produce a normal exposure from &quot;what the sensor sees&quot;, with a small set of
@@ -198,9 +252,11 @@ next to the measured preview fps, so an operator can verify AE/AF behaviour whil
 hardware.</p>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="coordinated-exposureservice-deferred--ki-006-stage-5">Coordinated ExposureService (deferred — KI-006, Stage 5)<a href="#coordinated-exposureservice-deferred--ki-006-stage-5" class="hash-link" aria-label="Direct link to Coordinated ExposureService (deferred — KI-006, Stage 5)" title="Direct link to Coordinated ExposureService (deferred — KI-006, Stage 5)" translate="no">​</a></h3>
 <p>The full picture below — coordinating the camera controls <strong>with</strong> the ring light, ambient/colour
-sensors, and per-event lighting profiles — is the deferred <code>ExposureService</code> hardware spike
-(KI-006). It needs the real lights and sensors to design against; the sensor-side controls above
-are the forward-compatible inputs it will later coordinate.</p>
+sensors, and per-event lighting profiles, including <strong>pre-capture metering</strong> — is the deferred
+<code>ExposureService</code> hardware spike (KI-006). It needs the real lights and sensors to design
+against. The exposure profiles above already store the camera-side intent (EV, metering,
+exposure mode) as the forward-compatible inputs it will coordinate; today only their ring-light
+calibration is applied.</p>
 <p>The planned ring light uses high-CRI dual-white LED strips with warm and cold channels, likely covering about 2700K to 6500K. The app should control both total brightness and warm/cold mix.</p>
 <p><code>ExposureService</code> should coordinate:</p>
 <ul>
@@ -223,13 +279,40 @@ are the forward-compatible inputs it will later coordinate.</p>
 </ul>
 <p>In club mode, the default should prefer stronger ring light and moderate gain before allowing shutter times long enough to blur people.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="wled-adapter">WLED Adapter<a href="#wled-adapter" class="hash-link" aria-label="Direct link to WLED Adapter" title="Direct link to WLED Adapter" translate="no">​</a></h2>
-<p>The first real adapter targets WLED-compatible ESP32 devices. It should support host/IP setup, brightness, preset ids, and test commands.</p>
+<p>The first real adapter targets WLED-compatible ESP32 devices over the WLED <strong>JSON API</strong>
+(the officially recommended integration surface), implemented in <code>adapters/lighting/wled.py</code>
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/wled-json-api-adapter">ADR-0027</a>). Verified request shapes:</p>
+<ul>
+<li class=""><strong>Set state</strong>: <code>POST http://{host}:{port}/json/state</code> with a partial state object;
+success → <code>{&quot;success&quot;:true}</code>.</li>
+<li class=""><strong>Default look</strong>: <code>{&quot;on&quot;:true,&quot;bri&quot;:&lt;1-255&gt;,&quot;tt&quot;:&lt;100ms units&gt;, &quot;seg&quot;:[{&quot;id&quot;:0,&quot;fx&quot;:0,&quot;col&quot;:[[R,G,B]]}]}</code> — <code>fx:0</code> is the Solid effect, stable across
+WLED builds.</li>
+<li class=""><strong>Ring-light white temperature</strong> (calibration, Stage 5 commit 3): segment <code>cct</code>,
+<code>0</code> (warm) … <code>255</code> (cold).</li>
+<li class=""><strong>Operator scene</strong>: a booth preset mapped to a saved WLED preset id → <code>{&quot;ps&quot;:&lt;1-250&gt;}</code>.</li>
+<li class=""><strong>Info / reachability</strong>: <code>GET /json/info</code> → <code>name</code>/<code>mac</code>.</li>
+</ul>
+<p>The HTTP call is behind an injectable transport (default <code>httpx</code>, a core dependency), so
+the request shape is unit-tested without a live controller. Host/port/timeout and the
+per-preset scene overrides are admin-editable <code>lighting</code> settings; reachability is cached
+(no network I/O on the status path). Real-controller verification is tracked as a
+known-issue (no WLED hardware at build time).</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="custom-esp32-adapter">Custom ESP32 Adapter<a href="#custom-esp32-adapter" class="hash-link" aria-label="Direct link to Custom ESP32 Adapter" title="Direct link to Custom ESP32 Adapter" translate="no">​</a></h2>
 <p>The custom adapter contract is newline-delimited JSON over serial or TCP. Example command:</p>
 <div class="language-json codeBlockContainer_TPi_ theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_hDBg"><pre tabindex="0" class="prism-code language-json codeBlock_Pnsf thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_NMcC"><div class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">{</span><span class="token property" style="color:#36acaa">&quot;command&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token string" style="color:#e3116c">&quot;preset&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token property" style="color:#36acaa">&quot;preset&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token string" style="color:#e3116c">&quot;countdown&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token property" style="color:#36acaa">&quot;brightness&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token number" style="color:#36acaa">180</span><span class="token punctuation" style="color:#393A34">}</span><br></div></code></pre></div></div>
 <p>Example response:</p>
 <div class="language-json codeBlockContainer_TPi_ theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_hDBg"><pre tabindex="0" class="prism-code language-json codeBlock_Pnsf thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_NMcC"><div class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">{</span><span class="token property" style="color:#36acaa">&quot;ok&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token boolean" style="color:#36acaa">true</span><span class="token punctuation" style="color:#393A34">,</span><span class="token property" style="color:#36acaa">&quot;preset&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token string" style="color:#e3116c">&quot;countdown&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token property" style="color:#36acaa">&quot;firmware&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token string" style="color:#e3116c">&quot;pixelbooth-esp32&quot;</span><span class="token punctuation" style="color:#393A34">}</span><br></div></code></pre></div></div>
-<p>The API should not expose WLED-specific details outside the adapter-specific configuration.</p>
+<p>This is implemented in <code>adapters/lighting/esp32.py</code>
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/custom-esp32-lighting-adapter">ADR-0028</a>). The adapter sends one JSON
+line per request and reads one line per response; an optional <code>&quot;cct&quot;</code> field (0 warm … 255
+cold) carries the ring-light white-temperature calibration, and firmware that does not
+understand it ignores it. The wire is abstracted behind an injectable <code>Esp32Transport</code>, so
+the adapter is unit-tested without hardware. Two real transports ship: <code>TcpEsp32Transport</code>
+(stdlib <code>socket</code>, no dependency) and <code>SerialEsp32Transport</code> (<code>pyserial</code>, the optional
+<code>esp32</code> extra, lazy-imported so the dev/CI/TCP paths never need the wheel). Both connect
+lazily so a missing device degrades on first use, not at startup. Transport selection,
+serial port/baud, and TCP host/port are admin-editable <code>lighting</code> settings. The API should
+not expose firmware-specific details outside the adapter-specific configuration.</p>
 <h2 class="anchor anchorTargetStickyNavbar_OywG" id="marquee-display">Marquee Display<a href="#marquee-display" class="hash-link" aria-label="Direct link to Marquee Display" title="Direct link to Marquee Display" translate="no">​</a></h2>
 <p>The marquee is not part of the camera or lighting path, but it subscribes to the same session events. It is driven by a Raspberry Pi Zero 2 W running a future marquee agent.</p>
 <p>Hardware plan:</p>
@@ -245,6 +328,6 @@ are the forward-compatible inputs it will later coordinate.</p>
 <li class=""><code>hard-2x2</code></li>
 <li class=""><code>soft-2x2</code></li>
 </ul>
-<p>The main app owns design storage, admin preview, trigger mapping, and push/status. The Pi Zero agent owns HUB75 output, local timing, panel refresh, brightness enforcement, and later GIF/video playback.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/architecture/camera-lighting.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/pixelbooth-docs/reference/architecture/admin-control-plane"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Admin Control Plane</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/pixelbooth-docs/reference/architecture/expanded-capabilities"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Expanded Capabilities Architecture</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#camera-roles" class="table-of-contents__link toc-highlight">Camera Roles</a></li><li><a href="#camera-backends-and-usb--v4l2-cameras" class="table-of-contents__link toc-highlight">Camera Backends And USB / V4L2 Cameras</a></li><li><a href="#autofocus" class="table-of-contents__link toc-highlight">Autofocus</a></li><li><a href="#camera-availability-and-degraded-mode" class="table-of-contents__link toc-highlight">Camera Availability And Degraded Mode</a></li><li><a href="#development-cameras" class="table-of-contents__link toc-highlight">Development Cameras</a></li><li><a href="#preview" class="table-of-contents__link toc-highlight">Preview</a></li><li><a href="#live-preview-camera-selection" class="table-of-contents__link toc-highlight">Live Preview Camera Selection</a></li><li><a href="#lighting-events" class="table-of-contents__link toc-highlight">Lighting Events</a></li><li><a href="#exposure-and-ring-light" class="table-of-contents__link toc-highlight">Exposure And Ring Light</a><ul><li><a href="#sensor-side-camera-exposure-implemented--adr-0025" class="table-of-contents__link toc-highlight">Sensor-side camera exposure (implemented — ADR-0025)</a></li><li><a href="#coordinated-exposureservice-deferred--ki-006-stage-5" class="table-of-contents__link toc-highlight">Coordinated ExposureService (deferred — KI-006, Stage 5)</a></li></ul></li><li><a href="#wled-adapter" class="table-of-contents__link toc-highlight">WLED Adapter</a></li><li><a href="#custom-esp32-adapter" class="table-of-contents__link toc-highlight">Custom ESP32 Adapter</a></li><li><a href="#marquee-display" class="table-of-contents__link toc-highlight">Marquee Display</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
+<p>The main app owns design storage, admin preview, trigger mapping, and push/status. The Pi Zero agent owns HUB75 output, local timing, panel refresh, brightness enforcement, and later GIF/video playback.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="row margin-top--sm theme-doc-footer-edit-meta-row"><div class="col noPrint_MoED"><a href="https://github.com/Katrines-Kaelder/pixelbooth/blob/main/.docs/architecture/camera-lighting.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_efOd" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vHmy"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/pixelbooth-docs/reference/architecture/admin-control-plane"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Admin Control Plane</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/pixelbooth-docs/reference/architecture/expanded-capabilities"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Expanded Capabilities Architecture</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_RZKG thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#camera-roles" class="table-of-contents__link toc-highlight">Camera Roles</a></li><li><a href="#camera-backends-and-usb--v4l2-cameras" class="table-of-contents__link toc-highlight">Camera Backends And USB / V4L2 Cameras</a></li><li><a href="#autofocus" class="table-of-contents__link toc-highlight">Autofocus</a></li><li><a href="#camera-availability-and-degraded-mode" class="table-of-contents__link toc-highlight">Camera Availability And Degraded Mode</a></li><li><a href="#development-cameras" class="table-of-contents__link toc-highlight">Development Cameras</a></li><li><a href="#preview" class="table-of-contents__link toc-highlight">Preview</a></li><li><a href="#live-preview-camera-selection" class="table-of-contents__link toc-highlight">Live Preview Camera Selection</a></li><li><a href="#lighting-service-and-adapters" class="table-of-contents__link toc-highlight">Lighting Service And Adapters</a><ul><li><a href="#default-looks-vs-operator-scenes" class="table-of-contents__link toc-highlight">Default looks vs operator scenes</a></li></ul></li><li><a href="#lighting-events" class="table-of-contents__link toc-highlight">Lighting Events</a></li><li><a href="#exposure-and-ring-light" class="table-of-contents__link toc-highlight">Exposure And Ring Light</a><ul><li><a href="#exposure-profiles--ring-light-calibration-implemented--adr-0029" class="table-of-contents__link toc-highlight">Exposure profiles + ring-light calibration (implemented — ADR-0029)</a></li><li><a href="#sensor-side-camera-exposure-implemented--adr-0025" class="table-of-contents__link toc-highlight">Sensor-side camera exposure (implemented — ADR-0025)</a></li><li><a href="#coordinated-exposureservice-deferred--ki-006-stage-5" class="table-of-contents__link toc-highlight">Coordinated ExposureService (deferred — KI-006, Stage 5)</a></li></ul></li><li><a href="#wled-adapter" class="table-of-contents__link toc-highlight">WLED Adapter</a></li><li><a href="#custom-esp32-adapter" class="table-of-contents__link toc-highlight">Custom ESP32 Adapter</a></li><li><a href="#marquee-display" class="table-of-contents__link toc-highlight">Marquee Display</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><span class="pixel-footer__brand">Pixelbooth</span><a class="pixel-footer__link" href="https://github.com/Katrines-Kaelder/pixelbooth">GitHub</a><span>© 2026 Katrines Kaelder. Built with Docusaurus.</span></div></div></div></footer></div>
 </body>
 </html>

@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">API Contract | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="API Contract | Pixelbooth Docs"><meta data-rh="true" name="description" content="Base path: /api/v1."><meta data-rh="true" property="og:description" content="Base path: /api/v1."><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"API Contract","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/api-contract"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.5722e56d.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.b45db21c.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -253,21 +253,25 @@ only when the asset is missing, the asset is undecodable/invalid, or the media t
 incompatible. The render never fails on overlay problems — it keeps the un-overlaid
 bytes and records the outcome on the media record (<code>overlay_status</code>).</p>
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="lighting">Lighting<a href="#lighting" class="hash-link" aria-label="Direct link to Lighting" title="Direct link to Lighting" translate="no">​</a></h3>
+<p>The <code>LightingService</code> sits behind a <code>LightingAdapter</code> boundary (fake by default; WLED
+and ESP32 land in later Stage 5 tasks) and is driven from booth session state — each
+transition applies the mapped <code>LightingPreset</code> and emits <code>lighting.status</code>
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/lighting-service-and-adapter-boundary">ADR-0026</a>).</p>
 <ul>
-<li class=""><code>GET /lighting/devices</code>
+<li class=""><code>GET /lighting/devices</code> <em>(implemented, guest-open)</em>
 <ul>
-<li class="">Lists configured/discovered lighting adapters.</li>
+<li class="">Returns a <code>LightingSnapshot</code>: discovered devices, the active preset, and lighting health.</li>
 </ul>
 </li>
-<li class=""><code>GET /lighting/presets</code>
-<ul>
-<li class="">Lists event-to-preset mappings.</li>
-</ul>
-</li>
-<li class=""><code>POST /lighting/test</code>
+<li class=""><code>POST /lighting/test</code> <em>(implemented, admin-gated)</em>
 <ul>
 <li class="">Body: <code>{ &quot;preset&quot;: &quot;countdown&quot; }</code></li>
-<li class="">Sends a test preset.</li>
+<li class="">Drives the lights to a preset as an operator test action; returns the snapshot.</li>
+</ul>
+</li>
+<li class=""><code>GET /lighting/presets</code> <em>(pending — preset-mapping task)</em>
+<ul>
+<li class="">Will list the persisted event/state-to-preset mappings once the mapping catalog lands.</li>
 </ul>
 </li>
 </ul>
@@ -553,7 +557,15 @@ single <code>countdown</code> then the <code>record</code> state for a timed win
 <li class=""><code>session.error</code></li>
 <li class=""><code>camera.status</code></li>
 <li class=""><code>camera.preview.selected</code></li>
-<li class=""><code>lighting.status</code></li>
+<li class=""><code>lighting.status</code>
+<ul>
+<li class="">Emitted whenever the active lighting preset changes — on each booth session
+transition (the <code>LightingService</code> is driven from session state, Stage 5) and on an
+admin <code>POST /lighting/test</code>. Payload is the <code>LightingSnapshot</code>:
+<code>{ devices: LightingDevice[], active_preset: LightingPreset | null, health }</code>
+(<a class="" href="/pixelbooth-docs/reference/architecture/decisions/lighting-service-and-adapter-boundary">ADR-0026</a>).</li>
+</ul>
+</li>
 <li class=""><code>exposure.metered</code></li>
 <li class=""><code>marquee.status</code></li>
 <li class=""><code>marquee.program</code></li>
@@ -594,6 +606,7 @@ so a code only becomes scannable once the upload is verified
 <li class=""><code>CaptureMode</code>: <code>still</code>, <code>collage</code>, <code>animation</code>, <code>boomerang</code>, <code>video</code></li>
 <li class=""><code>SessionState</code>: <code>idle</code>, <code>attract</code>, <code>countdown</code>, <code>capture</code>, <code>record</code>, <code>review</code>, <code>processing</code>, <code>present</code>, <code>complete</code>, <code>error</code></li>
 <li class=""><code>LightingPreset</code>: <code>idle</code>, <code>attract</code>, <code>countdown</code>, <code>capture</code>, <code>review</code>, <code>success</code>, <code>error</code>, <code>challenge</code></li>
+<li class=""><code>LightingDevice</code>: <code>{ id, label, kind, available }</code> — one discovered/configured lighting device (<code>kind</code> is <code>fake</code> today; <code>wled</code>/<code>esp32</code> later)</li>
 <li class=""><code>MediaType</code>: <code>image</code>, <code>collage</code>, <code>animation</code>, <code>video</code>, <code>test</code></li>
 <li class=""><code>MediaVariant</code>: <code>final</code>, <code>preview</code>, <code>thumb</code></li>
 <li class=""><code>OverlayStatus</code>: <code>none</code>, <code>applied</code>, <code>skipped</code></li>

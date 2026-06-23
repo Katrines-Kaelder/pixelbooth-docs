@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.10.1">
 <title data-rh="true">System Architecture | Pixelbooth Docs</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" name="twitter:image" content="https://katrines-kaelder.github.io/pixelbooth-docs/img/pixelbooth-social-card.svg"><meta data-rh="true" property="og:url" content="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/system-architecture"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="System Architecture | Pixelbooth Docs"><meta data-rh="true" name="description" content="Runtime Shape"><meta data-rh="true" property="og:description" content="Runtime Shape"><link data-rh="true" rel="icon" href="/pixelbooth-docs/img/favicon.svg"><link data-rh="true" rel="canonical" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/system-architecture"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/system-architecture" hreflang="en"><link data-rh="true" rel="alternate" href="https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/system-architecture" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"System Architecture","item":"https://katrines-kaelder.github.io/pixelbooth-docs/reference/architecture/system-architecture"}]}</script><link rel="stylesheet" href="/pixelbooth-docs/assets/css/styles.ec34127a.css">
-<script src="/pixelbooth-docs/assets/js/runtime~main.1572cfeb.js" defer="defer"></script>
-<script src="/pixelbooth-docs/assets/js/main.e5dd0887.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/runtime~main.5722e56d.js" defer="defer"></script>
+<script src="/pixelbooth-docs/assets/js/main.b45db21c.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -90,7 +90,12 @@ one may start; <code>abort</code> emits <code>session.completed</code> with <cod
 <h3 class="anchor anchorTargetStickyNavbar_OywG" id="orchestration-mechanism-stage-35">Orchestration mechanism (Stage 3.5)<a href="#orchestration-mechanism-stage-35" class="hash-link" aria-label="Direct link to Orchestration mechanism (Stage 3.5)" title="Direct link to Orchestration mechanism (Stage 3.5)" translate="no">​</a></h3>
 <p><code>SessionService</code> runs on the API event loop and drives the <strong>timed</strong> transitions
 (<code>countdown → capture → review</code>, and on confirm <code>processing → present → complete</code>) with an <code>asyncio</code> task, guarded by a single lock that enforces the
-single-active-session invariant. Blocking camera capture runs in a worker thread
+single-active-session invariant. The <code>present → complete</code> dwell is the operator
+auto-return window: <code>SessionTiming.present_seconds</code> is driven by
+<code>booth.auto_return_seconds</code> (KI-027), so the result stays on screen for that long
+before auto-completing back to attract. When <code>booth.auto_return_enabled</code> is off,
+<code>present_seconds</code> is <code>None</code> and the session holds at <code>present</code> until the guest
+acts (Play Again / Delete → <code>abort</code>). Blocking camera capture runs in a worker thread
 (<code>asyncio.to_thread</code>) so it never stalls the loop, and the move to <code>review</code>
 (instant preview) never waits on full-resolution rendering
 (<code>.claude/rules/fast-capture-path.md</code>).</p>
